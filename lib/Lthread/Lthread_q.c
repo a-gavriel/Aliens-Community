@@ -95,7 +95,6 @@ mythread_private_t *Lthread_q_search(unsigned long new_tid)
     mythread_private_t *p;
     if (mythread_q_head != NULL)
     {
-
         p = mythread_q_head;
         do
         {

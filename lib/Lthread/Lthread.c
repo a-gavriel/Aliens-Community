@@ -10,6 +10,7 @@
 #include <sys/wait.h>
 #include <sys/syscall.h>
 #include <sys/types.h>
+#include <sched.h>
 
 #include "../../include/Lthread.h"
 #include "./Lthread_q.h"
@@ -88,7 +89,6 @@ int Lthread_create(mythread_t *new_thread_ID, mythread_attr_t *attr, void *start
 
     /* Call clone with pointer to wrapper function. TCB will be passed as arg to wrapper function. */
     tid = clone(start_func, /*(char *)child_stack*/ (char *)child_stack + FIBER_STACK, /*FLAGS*/ SIGCHLD | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_VM, arg);
-
     if (tid == -1)
     {
         perror("clone");
@@ -99,8 +99,6 @@ int Lthread_create(mythread_t *new_thread_ID, mythread_attr_t *attr, void *start
     new_node->tid = tid;
     setbuf(stdout, NULL);
     printf("create: Finished initialising new thread: %ld\n", (unsigned long)new_thread_ID->tid);
-    //kill(tid, SIGSTOP);
-    // tid = kill(tid, SIGSTOP);
     return 0;
 }
 
@@ -108,46 +106,36 @@ int Lthread_create(mythread_t *new_thread_ID, mythread_attr_t *attr, void *start
  * just collect the return status. Else, wait for the thread to die and then
  * collect the return status
  */
-int Lthread_join(mythread_t target_thread, void **status)
+int Lthread_join(mythread_t target_thread_user, void **status)
 {
-    kill(target_thread.tid, SIGCONT);
+    mythread_private_t *target_thread_full, *self_thread_full;
+    pid_t self_tid = syscall(SYS_gettid);
+    self_thread_full = Lthread_q_search(self_tid);
+    target_thread_full = Lthread_q_search(target_thread_user.tid);
 
-    if (scheduler_type == FIFO || scheduler_type == LOTTERY)
+    if (target_thread_full->state == DEFUNCT)
     {
-        kill(target_thread.tid, SIGCONT);
-    }
-
-    mythread_private_t *target, *self_ptr;
-
-    pid_t t;
-
-    target = Lthread_q_search(target_thread.tid);
-
-    if (target->state == DEFUNCT)
-    {
-        *status = target->returnValue;
+        *status = target_thread_full->returnValue;
         return 0;
     }
 
-    if (target->blockedForJoin != NULL)
+    if (target_thread_full->blockedForJoin != NULL)
     {
         return -1;
     }
 
-    t = waitpid(target->tid, 0, 0);
+    target_thread_full->blockedForJoin = self_thread_full;
+    printf("Target: %d \n", target_thread_full->tid);
+    pid_t t = waitpid(target_thread_full->tid, 0, 0);
     if (t == -1)
     {
         perror("waitpid");
         exit(3);
     }
-
-    //setbuf(stdout, NULL);
-    printf("Child thread %d returned and stack freed.\n", target->tid);
-
-    //*status = target->returnValue;
-
-    target->state = DEFUNCT;
-
+    printf("Thread %d Joinet to %d.\n", self_thread_full->tid, target_thread_full->tid);
+    self_thread_full->state = BLOCKED;
+    //La siguiente linea genera un error, si se descomenta se caae el código, investigar por que
+    //*status = self_thread_full->returnValue;
     return 0;
 }
 
@@ -176,4 +164,17 @@ void Lthread_exit(void *value_ptr)
     printf("THREAD %d EXIT \n", thread->tid);
 
     syscall(SYS_exit, 0);
+}
+
+int Lthread_yield()
+{
+    if(sched_yield() == 0)
+    {
+        return EXIT_SUCCESS;
+    }
+    else
+    {
+        printf("Thread %d: Error during thread yiled \n", syscall(SYS_gettid));
+        return EXIT_FAILURE;
+    }
 }

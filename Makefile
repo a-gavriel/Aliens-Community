@@ -11,6 +11,7 @@ OBJ_DIR := obj
 BIN_DIR := bin
 LIB_DIR = lib
 LTHREAD_DIR = $(LIB_DIR)/Lthread
+LMUTEX_DIR = $(LIB_DIR)/Lmutex
 IDIR := include
 
 MFLAG = -lm

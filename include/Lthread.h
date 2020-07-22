@@ -77,4 +77,6 @@ void Lthread_exit(void *retval);
 
 void Lthread_sched(char *scheduler);
 
+int Lthread_yield();
+
 /* Private functions */
