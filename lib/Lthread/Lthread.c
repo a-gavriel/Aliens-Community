@@ -11,9 +11,10 @@
 #include <sys/syscall.h>
 #include <sys/types.h>
 #include <sched.h>
+#include <unistd.h>
 
 #include "../../include/Lthread.h"
-#include "./Lthread_q.h"
+#include "./Lthread_queue.h"
 
 #define FIBER_STACK 1024 * 64
 
@@ -84,21 +85,23 @@ int Lthread_create(mythread_t *new_thread_ID, mythread_attr_t *attr, void *start
     new_node->returnValue = NULL;
     new_node->blockedForJoin = NULL;
 
-    /* Put it in the Q of thread blocks */
+    // Put it in the Q of thread blocks
     Lthread_q_add(new_node);
 
-    /* Call clone with pointer to wrapper function. TCB will be passed as arg to wrapper function. */
+    // Call clone
     tid = clone(start_func, /*(char *)child_stack*/ (char *)child_stack + FIBER_STACK, /*FLAGS*/ SIGCHLD | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_VM, arg);
     if (tid == -1)
     {
         perror("clone");
         exit(2);
     }
+    //Thread is running
+    new_node->state = RUNNING;
     /* Save the tid returned by clone system call in the tcb. */
     new_thread_ID->tid = tid;
     new_node->tid = tid;
     setbuf(stdout, NULL);
-    printf("create: Finished initialising new thread: %ld\n", (unsigned long)new_thread_ID->tid);
+    //printf("create: Finished initialising new thread: %ld\n", (unsigned long)new_thread_ID->tid);
     return 0;
 }
 
@@ -124,15 +127,23 @@ int Lthread_join(mythread_t target_thread_user, void **status)
         return -1;
     }
 
+    if(self_thread_full == NULL)
+    {
+        //printf("Main Thread \n");
+        mythread_private_t temp;
+        temp.tid = getpid();
+        temp.state = BLOCKED;
+        self_thread_full = &temp;
+    }
+
     target_thread_full->blockedForJoin = self_thread_full;
-    printf("Target: %d \n", target_thread_full->tid);
+    //printf("Thread %d Joinet to %d.\n", self_thread_full->tid, target_thread_full->tid);
     pid_t t = waitpid(target_thread_full->tid, 0, 0);
     if (t == -1)
     {
         perror("waitpid");
         exit(3);
     }
-    printf("Thread %d Joinet to %d.\n", self_thread_full->tid, target_thread_full->tid);
     self_thread_full->state = BLOCKED;
     //La siguiente linea genera un error, si se descomenta se caae el código, investigar por que
     //*status = self_thread_full->returnValue;
@@ -157,15 +168,17 @@ void Lthread_exit(void *value_ptr)
     {
         thread->blockedForJoin->state = READY;
     }
-
-    // free(thread->args);
-
-    // setbuf(stdout, NULL);
-    printf("THREAD %d EXIT \n", thread->tid);
-
+    //free(thread->args);
+    //printf("THREAD %d EXIT \n", thread->tid);
     syscall(SYS_exit, 0);
+    //Lthread_q_delete(&thread);
 }
 
+/**
+ * Function for current thread relinquish the CPU.
+ * The thread is placed at the end of the run queue.
+ * Another thread is scheduled to run
+*/
 int Lthread_yield()
 {
     if(sched_yield() == 0)
@@ -174,7 +187,7 @@ int Lthread_yield()
     }
     else
     {
-        printf("Thread %d: Error during thread yiled \n", syscall(SYS_gettid));
+        printf("Thread %ld: Error during thread yiled \n", syscall(SYS_gettid));
         return EXIT_FAILURE;
     }
 }

@@ -47,36 +47,19 @@ extern int *scheduler_type;
 
 extern mythread_private_t *mythread_q_head; /* The pointer pointing to head node of the TCB queue */
 
-/*
- * mythread_create - prepares context of new_thread_ID as start_func(arg),
- * attr is ignored right now.
- * Threads are activated (run) according to the number of available LWPs
- * or are marked as ready.
- */
 int Lthread_create(mythread_t *new_thread_ID,
                     mythread_attr_t *attr,
                     void *start_func,
                     void *arg);
 
-int create(mythread_t *new_thread_ID, mythread_attr_t *attr, void *start_func, void *arg);
-/*
- * mythread_join - suspend calling thread if target_thread has not finished,
- * enqueue on the join Q of the target thread, then dispatch ready thread;
- * once target_thread finishes, it activates the calling thread / marks it
- * as ready.
- */
 int Lthread_join(mythread_t target_thread, void **status);
 
 int Lthread_detach(mythread_t thread_ID);
 
-/*
- * mythread_exit - exit thread, awakes joiners on return
- * from thread_func and dequeue itself from run Q before dispatching run->next
- */
 void Lthread_exit(void *retval);
 
 void Lthread_sched(char *scheduler);
 
-int Lthread_yield();
+void Lthread_q_state_display();
 
-/* Private functions */
+int Lthread_yield();

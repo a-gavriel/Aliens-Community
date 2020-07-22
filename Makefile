@@ -24,16 +24,19 @@ clean:
 createBin:
 	@mkdir $(BIN_DIR)
 
-build: Lthread TestLthread
+build: Lthread TestLthread TestPthread
 
 Lthread:
 	$(CC) -c ./$(LTHREAD_DIR)/Lthread.c -o ./$(LTHREAD_DIR)/Lthread.o
-	$(CC) -c ./$(LTHREAD_DIR)/Lthread_q.c -o ./$(LTHREAD_DIR)/Lthread_q.o
+	$(CC) -c ./$(LTHREAD_DIR)/Lthread_queue.c -o ./$(LTHREAD_DIR)/Lthread_queue.o
 	ar -rc ./$(LTHREAD_DIR)/libLthread.a ./$(LTHREAD_DIR)/*.o
 	ranlib ./$(LTHREAD_DIR)/libLthread.a
 
 TestLthread:
 	$(CC) ./$(SRC_DIR)/LthreadsTest.c -L./lib/Lthread/ -lLthread -o ./$(BIN_DIR)/LthreadTest
+
+TestPthread:
+	$(CC) ./$(SRC_DIR)/PthreadsTest.c -lpthread -o ./$(BIN_DIR)/PthreadTest
 
 
 
