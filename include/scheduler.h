@@ -1,0 +1,18 @@
+extern void Lthread_q_ssrr();
+extern void Lthread_q_swap_rr(void *_array, int size);
+extern void Lthread_q_lottery();
+extern void Lthread_q_choose_tickets(void *_array, int size_row, int size_columns, void *_tickets);
+extern void Lthread_q_print_array_simple(void *_array, int size);
+extern void Lthread_q_array_simple_fill(void *_array, int size);
+extern void Lthread_q_array_simple_append(void *_array, int size, int number);
+extern void Lthread_q_unlock_fifo();
+extern void Lthread_q_unlock_lottery(void *_array, int size);
+extern int Lthread_q_array_verify(int **array, int size_row, int size_columns, int rand);
+extern void Lthread_q_array_fill(int **array, int size_row, int size_columns);
+extern int Lthread_q_array_isfull(int **array, int size_row, int size_columns);
+extern int Lthread_q_array_simple_isfull(void *_array, int size);
+extern int Lthread_q_array_simple_verify(void *_array, int size, int rand);
+extern void Lthread_q_print_array(int **array, int size_row, int size_columns);
+extern void Lthread_q_array_append(void *_array, int size_row, int size_columns, int number);
+extern int Lthread_q_count();
+extern void Lthread_q_queue_fill_pid(void *_array, int size);
