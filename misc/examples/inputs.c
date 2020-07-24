@@ -3,8 +3,8 @@
 #include <allegro5/allegro5.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_primitives.h>
-#include <allegro5/allegro_image.h>
-#include "../include/graph_points.h"
+
+// gcc inputs.c `pkg-config --libs allegro-5 allegro_font-5 allegro_image-5 allegro_ttf-5 allegro_primitives-5`
 
 void must_init(bool test, const char *description)
 {
@@ -29,26 +29,17 @@ int main()
     al_set_new_display_option(ALLEGRO_SAMPLES, 8, ALLEGRO_SUGGEST);
     al_set_new_bitmap_flags(ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR);
 
-    ALLEGRO_DISPLAY* disp = al_create_display(1380, 760);
+    ALLEGRO_DISPLAY* disp = al_create_display(640, 480);
     must_init(disp, "display");
 
     ALLEGRO_FONT* font = al_create_builtin_font();
     must_init(font, "font");
 
-	must_init(al_init_image_addon(), "image addon");
-	ALLEGRO_BITMAP* wallpaper = al_load_bitmap("../misc/imgs/Fondo.png");
-    must_init(wallpaper, "wallpaper");
-
-    ALLEGRO_BITMAP* alien1 = al_load_bitmap("../misc/imgs/Alien1.png");
-    must_init(alien1, "alien1");
-
     must_init(al_init_primitives_addon(), "primitives");
-    must_init(al_install_mouse(), "mouse");
 
     al_register_event_source(queue, al_get_keyboard_event_source());
     al_register_event_source(queue, al_get_display_event_source(disp));
     al_register_event_source(queue, al_get_timer_event_source(timer));
-    al_register_event_source(queue, al_get_mouse_event_source());       
 
     bool done = false;
     bool redraw = true;
@@ -58,7 +49,6 @@ int main()
     x = 100;
     y = 100;
 
-    int counter = 0;
 
     #define KEY_SEEN     1
     #define KEY_RELEASED 2
@@ -75,6 +65,15 @@ int main()
         switch(event.type)
         {
             case ALLEGRO_EVENT_TIMER:
+                if(key[ALLEGRO_KEY_UP])
+                    y--;
+                if(key[ALLEGRO_KEY_DOWN])
+                    y++;
+                if(key[ALLEGRO_KEY_LEFT])
+                    x--;
+                if(key[ALLEGRO_KEY_RIGHT])
+                    x++;
+
                 if(key[ALLEGRO_KEY_ESCAPE])
                     done = true;
 
@@ -84,14 +83,6 @@ int main()
                 redraw = true;
                 break;
 
-
-            case  ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
-                printf("clicked: %d,%d\n",event.mouse.x,event.mouse.y);
-                counter++;
-                counter %= 12;
-                x = down_top_right[counter].x;
-                y = down_top_right[counter].y;
-                printf("moved rect to: %f,%f\n",x,y);
             case ALLEGRO_EVENT_KEY_DOWN:
                 key[event.keyboard.keycode] = KEY_SEEN | KEY_RELEASED;
                 break;
@@ -110,16 +101,15 @@ int main()
         if(redraw && al_is_event_queue_empty(queue))
         {
             al_clear_to_color(al_map_rgb(0, 0, 0));
-			al_draw_bitmap(wallpaper,0,0,0);
-            al_draw_filled_rectangle(100, 100, 100 + 10, 100 + 10, al_map_rgb(255, 0, 0));
-			al_draw_bitmap(alien1, x, y, 0);
+            al_draw_textf(font, al_map_rgb(255, 255, 255), 0, 0, 0, "X: %.1f Y: %.1f", x, y);
+            al_draw_filled_rectangle(x, y, x + 10, y + 10, al_map_rgb(255, 0, 0));
+
             al_flip_display();
 
             redraw = false;
         }
     }
-	al_destroy_bitmap(wallpaper);
-	al_destroy_bitmap(alien1);
+
     al_destroy_font(font);
     al_destroy_display(disp);
     al_destroy_timer(timer);

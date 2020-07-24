@@ -1,10 +1,10 @@
 all: clean createBin build
-.PHONY: clean createBin build
+.PHONY: clean createBin build graphics
 
 CFLAGS = -Wall
 CC := gcc
 LDLIBS = -lrt -lpthread
-
+ALLEGRO_LIBS = allegro-5 allegro_font-5 allegro_image-5 allegro_ttf-5 allegro_primitives-5
 
 SRC_DIR := src
 OBJ_DIR := obj
@@ -47,4 +47,5 @@ Tests:
 	$(CC) ./$(SRC_DIR)/Tests.c -L./$(LTHREAD_DIR)/ -L./$(UTILS_DIR)/ -lUtils -lLpthreads -lpthread -o ./$(BIN_DIR)/Tests
 
 
-
+graphics:
+	$(CC) ./$(SRC_DIR)/graphics.c -o ./$(BIN_DIR)/graphics `pkg-config --libs $(ALLEGRO_LIBS)`
