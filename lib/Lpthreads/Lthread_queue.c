@@ -3,31 +3,28 @@
 #include <sys/syscall.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include "../../include/Lthread.h"
+#include "../../include/Lpthreads.h"
 
 /* The global extern pointer defined in mythread.h which points to the head node in
    Queue of the Thread Control Blocks.
 */
-mythread_private_t *mythread_q_head;
+lpthread_private_t *mythread_q_head;
 int *scheduler_type;
 
 /* This function initializes the Queue with a single node.
 */
-void Lthread_q_init(mythread_private_t *node)
+void Lthread_q_init(lpthread_private_t *node)
 {
-
     node->prev = node;
     node->next = node;
-
     mythread_q_head = node;
 }
 
 /* This function adds a node to the Queue, at the end of the Queue. 
    This is equivalent to Enque operation.
  */
-void Lthread_q_add(mythread_private_t *node)
+void Lthread_q_add(lpthread_private_t *node)
 {
-
     if (mythread_q_head == NULL)
     {
 
@@ -45,10 +42,9 @@ void Lthread_q_add(mythread_private_t *node)
 
 /* This function deleted a specified(passed as a parameter) node from the Queue.
  */
-void Lthread_q_delete(mythread_private_t *node)
+void Lthread_q_delete(lpthread_private_t *node)
 {
-
-    mythread_private_t *p;
+    lpthread_private_t *p;
     if (node == mythread_q_head && node->next == mythread_q_head)
     {
         printf("The Q is now Empty!\n");
@@ -75,7 +71,7 @@ void Lthread_q_state_display()
     if (mythread_q_head != NULL)
     {
         printf("State of Threads are -> \n");
-        mythread_private_t *p;
+        lpthread_private_t *p;
         p = mythread_q_head;
         do
         {
@@ -106,10 +102,10 @@ void Lthread_q_state_display()
 
 /* This function iterates over the Queue and prints out the state of the specified thread.
  */
-mythread_private_t *Lthread_q_search(unsigned long new_tid)
+lpthread_private_t *Lthread_q_search(unsigned long new_tid)
 {
 
-    mythread_private_t *p;
+    lpthread_private_t *p;
     if (mythread_q_head != NULL)
     {
         p = mythread_q_head;
@@ -130,7 +126,7 @@ mythread_private_t *Lthread_q_search(unsigned long new_tid)
 
 void Lthread_q_lock(unsigned long new_tid)
 {
-    mythread_private_t *p;
+    lpthread_private_t *p;
 
     if (mythread_q_head != NULL)
     {
@@ -158,7 +154,7 @@ void Lthread_q_lock(unsigned long new_tid)
 void Lthread_q_unlock(unsigned long new_tid)
 {
 
-    mythread_private_t *p;
+    lpthread_private_t *p;
 
     if (mythread_q_head != NULL)
     {
@@ -184,7 +180,7 @@ void Lthread_q_unlock(unsigned long new_tid)
 
 void Lthread_q_lock_all()
 {
-    mythread_private_t *p;
+    lpthread_private_t *p;
 
     if (mythread_q_head != NULL)
     {

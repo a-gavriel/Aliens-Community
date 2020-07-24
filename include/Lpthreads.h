@@ -18,19 +18,19 @@
 #define LOTTERY 2
 #define REAL 3
 
-typedef struct mythread_attr
+typedef struct lpthread_attr
 {
     unsigned long stackSize; /* Stack size to be used by this thread. Default is SIGSTKSZ */
-} mythread_attr_t;
+} lpthread_attr_t;
 
 /* Thread Handle exposed to the user */
-typedef struct mythread
+typedef struct lpthread
 {
     pid_t tid; /* The thread-id of the thread */
-} mythread_t;
+} lpthread_t;
 
 /* The Actual Thread Control Block structure */
-typedef struct mythread_private
+typedef struct lpthread_private
 {
 
     pid_t tid;                               /* The thread-id of the thread */
@@ -38,25 +38,25 @@ typedef struct mythread_private
     void *(*start_func)(void *);             /* The func pointer to the thread function to be executed. */
     void *args;                              /* The arguments to be passed to the thread function. */
     void *returnValue;                       /* The return value that thread returns. */
-    struct mythread_private *blockedForJoin; /* Thread blocking on this thread */
-    struct mythread_private *prev, *next;
+    struct lpthread_private *blockedForJoin; /* Thread blocking on this thread */
+    struct lpthread_private *prev, *next;
 
-} mythread_private_t;
+} lpthread_private_t;
 
 extern int *scheduler_type;
 
-extern mythread_private_t *mythread_q_head; /* The pointer pointing to head node of the TCB queue */
+extern lpthread_private_t *mythread_q_head; /* The pointer pointing to head node of the TCB queue */
 
-int Lthread_create(mythread_t *new_thread_ID,
-                    mythread_attr_t *attr,
+int Lthread_create(lpthread_t *new_thread_ID,
+                    lpthread_attr_t *attr,
                     void *start_func,
                     void *arg);
 
-int Lthread_join(mythread_t target_thread, void **status);
+int Lthread_join(lpthread_t target_thread, void **status);
 
-int Lthread_detach(mythread_t thread_ID);
+int Lthread_detach(lpthread_t thread_ID);
 
-void Lthread_exit(void *retval);
+int Lthread_end(void *retval);
 
 void Lthread_sched(char *scheduler);
 

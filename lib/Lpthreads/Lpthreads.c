@@ -13,7 +13,7 @@
 #include <sched.h>
 #include <unistd.h>
 
-#include "../../include/Lthread.h"
+#include "../../include/Lpthreads.h"
 #include "./Lthread_queue.h"
 
 #define FIBER_STACK 1024 * 64
@@ -21,7 +21,7 @@
 /* The global extern pointer defined in mythread.h which points to the head node in
    Queue of the Thread Control Blocks. 
  */
-mythread_private_t *mythread_q_head;
+lpthread_private_t *mythread_q_head;
 int *scheduler_type;
 
 
@@ -32,15 +32,14 @@ int *scheduler_type;
    The mythread_attr_t argument can optionally specify the stack size to be used
    the newly created thread.
  */
-int Lthread_create(mythread_t *new_thread_ID, mythread_attr_t *attr, void *start_func, void *arg)
+int Lthread_create(lpthread_t *new_thread_ID, lpthread_attr_t *attr, void *start_func, void *arg)
 {
     void *child_stack;
     unsigned long stackSize;
-    mythread_private_t *new_node;
+    lpthread_private_t *new_node;
     pid_t tid;
 
-    new_node = (mythread_private_t *)malloc(sizeof(mythread_private_t));
-
+    new_node = (lpthread_private_t *)malloc(sizeof(lpthread_private_t));
     if (new_node == NULL)
     {
         printf("Cannot allocate memory for node\n");
@@ -109,16 +108,16 @@ int Lthread_create(mythread_t *new_thread_ID, mythread_attr_t *attr, void *start
  * just collect the return status. Else, wait for the thread to die and then
  * collect the return status
  */
-int Lthread_join(mythread_t target_thread_user, void **status)
+int Lthread_join(lpthread_t target_thread_user, void **status)
 {
-    mythread_private_t *target_thread_full, *self_thread_full;
+    lpthread_private_t *target_thread_full, *self_thread_full;
     pid_t self_tid = syscall(SYS_gettid);
     self_thread_full = Lthread_q_search(self_tid);
     target_thread_full = Lthread_q_search(target_thread_user.tid);
 
     if (target_thread_full->state == DEFUNCT)
     {
-        *status = target_thread_full->returnValue;
+        //*status = target_thread_full->returnValue;
         return 0;
     }
 
@@ -130,7 +129,7 @@ int Lthread_join(mythread_t target_thread_user, void **status)
     if(self_thread_full == NULL)
     {
         //printf("Main Thread \n");
-        mythread_private_t temp;
+        lpthread_private_t temp;
         temp.tid = getpid();
         temp.state = BLOCKED;
         self_thread_full = &temp;
@@ -153,12 +152,18 @@ int Lthread_join(mythread_t target_thread_user, void **status)
 /**
  * This function indicates when a thread ends his execution
  */
-void Lthread_exit(void *value_ptr)
+int Lthread_end(void *value_ptr)
 {
     pid_t t = syscall(SYS_gettid);
 
-    mythread_private_t *thread = Lthread_q_search(t);
+    lpthread_private_t *thread = Lthread_q_search(t);
 
+    if(thread == NULL ||  thread->state == DEFUNCT)
+    {
+        printf("Error killing the thread \n");
+        printf("This isn't a thread or the thread is already killed \n");
+        return EXIT_FAILURE;
+    }
     thread->state = DEFUNCT;
     thread->returnValue = value_ptr;
 
@@ -171,6 +176,7 @@ void Lthread_exit(void *value_ptr)
     //free(thread->args);
     //printf("THREAD %d EXIT \n", thread->tid);
     syscall(SYS_exit, 0);
+    return EXIT_SUCCESS;
     //Lthread_q_delete(&thread);
 }
 

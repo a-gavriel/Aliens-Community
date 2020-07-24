@@ -5,57 +5,65 @@
 #include <unistd.h>
 #include <sys/syscall.h>
 
-pthread_t thread1, thread2, thread3;
+pthread_t thread1, thread2, thread3, thread4, thread5;
+pthread_mutex_t mutex;
 
-int *TestFunction3(int value)
-{
-    int i = 0;
-    while (i != 10)
-    {
-        printf("THREAD %d \n", value);
-        sleep(3);
-        i += 1;
-    }
-    printf("EXIT Thread: 3 \n");
-    pthread_exit(NULL);
-    return EXIT_SUCCESS;
-}
+int z, x = 0;
+long int y = 0;
 
 int *TestFunction2(int value)
-{
-    pthread_create(&thread3, NULL, (void *)TestFunction3, (int *)3);
-    int i = 0;
-    while (i != 10)
+{   
+    for(int i=0; i<100; i++)
     {
-        printf("THREAD %d \n", value);
-        sleep(2);
-        i += 1;
+        sleep(0.2);
+        z++;
+        x = x + z + value;
+        y = y + x + 2;
+        pthread_mutex_unlock(&mutex);
     }
-    pthread_join(thread3, NULL);
-    printf("EXIT Thread: 2 \n");
+    printf("EXIT Thread: %d \n", value);
     pthread_exit(NULL);
     return EXIT_SUCCESS;
 }
 
 int *TestFunction1(int value)
-{
-    int i = 0;
-    while (i != 10)
+{   
+    for(int i=0; i<100; i++)
     {
-        printf("THREAD %d \n", value);
-        sleep(1);
-        i += 1;
+        z++;
+        x = x + z + value;
+        y = y + x + 2;
     }
-    printf("EXIT Thread: 1 \n");
-    pthread_exit(NULL);
     return EXIT_SUCCESS;
+}
+void Test_Lpthread()
+{
+    pthread_create(&thread1, NULL, (void *)TestFunction2, (void *)1);
+    pthread_create(&thread2, NULL, (void *)TestFunction2, (void *)2);
+    pthread_create(&thread3, NULL, (void *)TestFunction2, (void *)3);
+    pthread_create(&thread4, NULL, (void *)TestFunction2, (void *)4);
+    pthread_create(&thread5, NULL, (void *)TestFunction2, (void *)5);
+    pthread_join(thread1, NULL);
+    pthread_join(thread2, NULL);
+    pthread_join(thread3, NULL);
+    pthread_join(thread4, NULL);
+    pthread_join(thread5, NULL);
+    printf("Value of shared var x: %d and y: %ld \n", x,y);
+    x = 0;
+    y = 0;
+    z = 0;
+    TestFunction1(1);
+    TestFunction1(2);
+    TestFunction1(3);
+    TestFunction1(4);
+    TestFunction1(5);
+    printf("Value of shared var x: %d and y: %ld \n", x,y);
 }
 
 int main()
 {
-    char *status;
-    pthread_create(&thread1, NULL, (void *)TestFunction1, (int *)1);
-    pthread_create(&thread2, NULL, (void *)TestFunction2, (int *)2);
-    pthread_join(thread2, NULL);
+    pthread_mutex_init(&mutex, NULL);
+    Test_Lpthread();
+    pthread_mutex_destroy(&mutex);
     return EXIT_SUCCESS;
 }
