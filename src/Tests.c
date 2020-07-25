@@ -12,7 +12,7 @@
 
 //*****************
 //Lpthread Var
-lpthread_t lpthread[7];
+lpthread_t lpthread[8];
 lmutex_t lmutex;
 lmutex_t lmutex_trylock;
 //*****************
@@ -59,6 +59,7 @@ void Lpthread_Test()
     printf("Value of shared var x: %d and y: %d and z: %d \n", x,y,z);
 }
 
+int a = 0;
 //Test Lmutex Try Lock
 int *Lpthread_Test_trylock_Aux(int id)
 {
@@ -69,7 +70,8 @@ int *Lpthread_Test_trylock_Aux(int id)
         {
             printf("Thread %d : Capture the Lock \n", id);
             i++;
-            printf("Thread %d : Increment the counter: i = %d \n", id,i);
+            a++;
+            printf("Thread %d : Increment the counter: i = %d \n", id,a);
             Lmutex_unlock(&lmutex_trylock);
         }
         else
@@ -81,10 +83,37 @@ int *Lpthread_Test_trylock_Aux(int id)
 
 void Lpthread_Test_trylock()
 {
+    printf("Final Value need to be: %d \n", 10);
     Lthread_create(&lpthread[5], NULL, Lpthread_Test_trylock_Aux, (int *)1);
     Lthread_create(&lpthread[6], NULL, Lpthread_Test_trylock_Aux, (int *)2);
     Lthread_join(lpthread[5], NULL);
     Lthread_join(lpthread[6], NULL);
+}
+
+//Detach Test Code
+
+int Lpthread_Test_Detach_Aux()
+{
+    for(int i = 0; i<5; i++)
+    {
+        sleep(1);
+    }
+    return EXIT_SUCCESS;
+}
+
+int Lpthread_Test_Detach()
+{
+    printf("Run Thread 1 \n");
+    Lthread_create(&lpthread[7], NULL, Lpthread_Test_Detach_Aux, NULL);
+    printf("Detach Thread 1 \n");
+    Lthread_detach(lpthread[7]);
+    printf("Try Join Thread 1 \n");
+    if(Lthread_join(lpthread[7], NULL) == -2)
+    {
+        printf("Can't Join Thread 1 was detached \n");
+    }
+    sleep(3);
+    return EXIT_SUCCESS;
 }
 
 //Pthreads Test Code
@@ -148,6 +177,9 @@ int main()
     Lmutex_init(&lmutex_trylock, 1);
     Lpthread_Test_trylock();
     Lmutex_destroy(&lmutex_trylock);
+    printf("****************************** \n");
+    printf("Run Detach Test \n");
+    Lpthread_Test_Detach();
     printf("****************************** \n");
     printf("Run Random Generators Test \n");
     Test_ramdom_generators();

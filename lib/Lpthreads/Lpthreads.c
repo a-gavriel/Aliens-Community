@@ -83,6 +83,7 @@ int Lthread_create(lpthread_t *new_thread_ID, lpthread_attr_t *attr, void *start
 
     new_node->returnValue = NULL;
     new_node->blockedForJoin = NULL;
+    new_node->joinable = 1;
 
     // Put it in the Q of thread blocks
     Lthread_q_add(new_node);
@@ -115,10 +116,10 @@ int Lthread_join(lpthread_t target_thread_user, void **status)
     self_thread_full = Lthread_q_search(self_tid);
     target_thread_full = Lthread_q_search(target_thread_user.tid);
 
-    if (target_thread_full->state == DEFUNCT)
+    if (target_thread_full->state == DEFUNCT || target_thread_full->joinable == 0)
     {
         //*status = target_thread_full->returnValue;
-        return 0;
+        return -2;
     }
 
     if (target_thread_full->blockedForJoin != NULL)
@@ -176,8 +177,11 @@ int Lthread_end(void *value_ptr)
     //free(thread->args);
     //printf("THREAD %d EXIT \n", thread->tid);
     syscall(SYS_exit, 0);
+    if(thread->joinable == 0)
+    {
+        Lthread_q_delete(thread);
+    }
     return EXIT_SUCCESS;
-    //Lthread_q_delete(&thread);
 }
 
 /**
@@ -196,4 +200,25 @@ int Lthread_yield()
         printf("Thread %ld: Error during thread yiled \n", syscall(SYS_gettid));
         return EXIT_FAILURE;
     }
+}
+
+/**
+ * Function for Detach a Thread
+ * Set Joinable property = 0
+ * After that the thread can't be Joined
+*/
+int Lthread_detach(lpthread_t thread)
+{
+    lpthread_private_t *self_thread_full;
+    self_thread_full = Lthread_q_search(thread.tid);
+    if(self_thread_full == NULL) //Isn't a thread created by Lphtreads library
+    {
+        printf("Thread isn't created by Lpthreads Library \n");
+        return EXIT_FAILURE;
+    }
+    else
+    {
+        self_thread_full->joinable = 0;  
+    }
+    return EXIT_SUCCESS;
 }
