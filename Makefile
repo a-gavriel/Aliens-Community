@@ -1,5 +1,5 @@
 all: clean createBin build
-.PHONY: clean createBin build graphics
+.PHONY: clean createBin build
 
 CFLAGS = -Wall
 CC := gcc
@@ -30,7 +30,7 @@ clean:
 createBin:
 	@mkdir $(BIN_DIR)
 
-build: Lpthreads Utils Tests
+build: Lpthreads Utils Tests graphics
 
 Lpthreads:
 	$(CC) -c ./$(LTHREAD_DIR)/Lpthreads.c -o ./$(LTHREAD_DIR)/Lpthreads.o
