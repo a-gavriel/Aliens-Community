@@ -8,7 +8,9 @@
 
 #include "../include/Lpthreads.h"
 #include "../include/Lmutex.h"
-#include "../include/Random.h"
+#include "../include/Random_Generators.h"
+#include "../include/json.h"
+#include "../include/ConfigFile_Reader.h"
 
 //*****************
 //Lpthread Var
@@ -152,8 +154,17 @@ void Pthread_Test()
 void Test_ramdom_generators()
 {
     srand(time(NULL));
-    printf("Rand Number: %d \n", Get_random_value(100));
-    printf("Rand String: %s \n", Get_random_string(10));
+    printf("Rand Number: %d \n", get_random_int(100));
+    printf("Rand String: %s \n", get_random_string(10));
+}
+
+void TestJson()
+{
+    bridge_t bridgeI;
+    char *file =  "bridge_config_file_I.json";
+    Read_bridge_configFile(file, &bridgeI);
+    printf("Size: %d \n", bridgeI.size);
+    printf("Max Weigth: %d \n", bridgeI.max_weigth);
 }
 
 int main()
@@ -183,5 +194,8 @@ int main()
     printf("****************************** \n");
     printf("Run Random Generators Test \n");
     Test_ramdom_generators();
+    printf("****************************** \n");
+    printf("Run Json Test \n");
+    TestJson();
     return EXIT_SUCCESS;
 }
