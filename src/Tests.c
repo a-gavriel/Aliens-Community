@@ -161,10 +161,29 @@ void Test_ramdom_generators()
 void TestJson()
 {
     bridge_t bridgeI;
-    char *file =  "bridge_config_file_I.json";
-    Read_bridge_configFile(file, &bridgeI);
-    printf("Size: %d \n", bridgeI.size);
-    printf("Max Weigth: %d \n", bridgeI.max_weigth);
+    alien_beta_t alienB;
+    alien_normal_t alienN;
+    aliens_generator_t alienG;
+    //char *file =  "bridge_config_file_I.json";
+    Read_bridge_configFile(FILE_NAME_BRIDGE_I, &bridgeI);
+    Read_alien_normal_configFile(FILE_NAME_ALIEN_N, &alienN);
+    Read_alien_beta_configFile(FILE_NAME_ALIEN_B, &alienB);
+    Read_aliens_generator_configFile(FILE_NAME_ALIEN_GENERATOR, &alienG);
+    printf("Bridge Config File \n");
+    printf("\t Size: %d \n", bridgeI.size);
+    printf("\t Max Weigth: %d \n", bridgeI.max_weigth);
+    printf("\t Bridge: %d \n", bridgeI.bridge_type);
+    printf("\t Scheduler: %d \n", bridgeI.scheduler_type);
+    printf("\t QueueSize: %d \n", bridgeI.queue_size);
+    printf("Alien Normal Config File \n");
+    printf("\t Speed: %d \n", alienN.speed);
+    printf("Alien Beta Config File \n");
+    printf("\t Execution Time: %d \n", alienB.execution_time);
+    printf("Aliens Generator Config File \n");
+    printf("\t Normal Percentage : %d \n", alienG.normal);
+    printf("\t Beta Percentage : %d \n", alienG.beta);
+    printf("\t Alfa Percentage : %d \n", alienG.alfa);
+    printf("\t Mean Time : %d \n", alienG.mean);
 }
 
 int main()
