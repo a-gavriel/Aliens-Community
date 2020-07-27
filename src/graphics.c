@@ -41,18 +41,41 @@ void must_init(bool test, const char *description)
     exit(1);
 }
 
-void draw_aliens(ALLEGRO_BITMAP* image){
-    pthread_t cid;
+void draw_aliens(ALLEGRO_BITMAP* alien1, ALLEGRO_BITMAP* alien2, ALLEGRO_BITMAP* alien3 ){
+    pid_t cid;
     float cx,cy;
+    char alienType;
+    const Point* route_coords;
     for (int i = 0; i< 16; ++i){
         alien_t* currentRoute = routes[i];        
         for (int j = 0; j < routes_sizes[i] ; ++j){
             cid = currentRoute[j].threadID;           
             if (cid != 0) {
-                const Point* route_coords = routes_coords[i];    
+                route_coords = routes_coords[i];    
                 cx = route_coords[j].x;
                 cy = route_coords[j].y;
-                al_draw_bitmap(image, cx, cy, 0);
+                alienType = currentRoute[j].alienType;
+                switch(alienType){
+                    case 'N':
+                        al_draw_bitmap(alien1, cx, cy, 0);
+                        break;
+                    case 'n':
+                        al_draw_bitmap(alien1, cx, cy, ALLEGRO_FLIP_HORIZONTAL );
+                        break;
+                    case 'A':
+                        al_draw_bitmap(alien2, cx, cy, 0);
+                        break;
+                    case 'a':
+                        al_draw_bitmap(alien2, cx, cy, ALLEGRO_FLIP_HORIZONTAL);
+                        break;
+                    case 'B':
+                        al_draw_bitmap(alien3, cx, cy, 0);
+                        break;
+                    case 'b':
+                        al_draw_bitmap(alien3, cx, cy, ALLEGRO_FLIP_HORIZONTAL);
+                        break;
+                    
+                }
             }
         }
     }
@@ -87,6 +110,10 @@ int main()
 
     ALLEGRO_BITMAP* alien1 = al_load_bitmap("../misc/imgs/Alien1.png");
     must_init(alien1, "alien1");
+    ALLEGRO_BITMAP* alien2 = al_load_bitmap("../misc/imgs/Alien2.png");
+    must_init(alien2, "alien2");
+    ALLEGRO_BITMAP* alien3 = al_load_bitmap("../misc/imgs/Alien3.png");
+    must_init(alien3, "alien3");
 
     must_init(al_init_primitives_addon(), "primitives");
     must_init(al_install_mouse(), "mouse");
@@ -128,8 +155,8 @@ int main()
                 if(key[ALLEGRO_KEY_UP]){ 
                     key[ALLEGRO_KEY_UP] = 0;
                     counter = (counter + 1)%12;                    
-                    x = down_top_right[counter].x;
-                    y = down_top_right[counter].y;
+                    x = A_top_right[counter].x;
+                    y = A_top_right[counter].y;
                     
                     printf("moved rect to: %f,%f\n",x,y);
                     }
@@ -141,7 +168,7 @@ int main()
                     key[i] = 0;
                 if(frame == f_new_alien){
                     frame = 0;
-                    generateAlien('A');
+                    generateAlien(alienTypes+rand()%6);
                 }
                 redraw = true;
                 ++frame;
@@ -174,7 +201,7 @@ int main()
             al_clear_to_color(al_map_rgb(0, 0, 0));
 			al_draw_bitmap(wallpaper,0,0,0);
             al_draw_filled_rectangle(100, 100, 100 + 10, 100 + 10, al_map_rgb(255, 0, 0));
-			draw_aliens(alien1);
+			draw_aliens(alien1, alien2, alien3);
             al_flip_display();
 
             redraw = false;
@@ -182,6 +209,8 @@ int main()
     }
 	al_destroy_bitmap(wallpaper);
 	al_destroy_bitmap(alien1);
+    al_destroy_bitmap(alien2);
+    al_destroy_bitmap(alien3);
     al_destroy_font(font);
     al_destroy_display(disp);
     al_destroy_timer(timer);

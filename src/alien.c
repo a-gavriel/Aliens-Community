@@ -1,0 +1,104 @@
+#define _GNU_SOURCE
+#include <sys/syscall.h>
+//#include <sys/types.h>
+//#include <unistd.h>
+
+#include "../include/alien.h"
+#include "../include/Lpthreads.h"
+#include "../include/graph_points.h"
+
+#define A_START 1
+#define B_START 15
+
+const char alienTypes[6] = {'N','A','B','n','a','b'};
+
+alien_t *routes[16] = { aliens_A_in, aliens_A_out, aliens_A_top_left, 
+aliens_A_top_center, aliens_A_top_right, aliens_B_top_left, 
+aliens_B_top_center, aliens_B_top_right, aliens_A_bottom_left, 
+aliens_A_bottom_center, aliens_A_bottom_right, aliens_B_bottom_left, 
+aliens_B_bottom_center, aliens_B_bottom_right, aliens_B_in, aliens_B_out};
+
+int getAlien(int x, int y){
+    printf("Coords %d,%d \n",x,y);
+    int cx, cy;
+    pid_t cid;
+    for (int i = 0; i< 16; ++i){
+        alien_t* currentRoute = routes[i];  
+        const Point *currentRoute_coords = routes_coords[i];      
+        for (int j = 0; j < routes_sizes[i] ; ++j){
+            cid = currentRoute[j].threadID;
+            cx = (int)currentRoute_coords[j].x;
+            cy = (int)currentRoute_coords[j].y;            
+            if (cx < x && x < cx+30 && cy < y && y < cy+30 ) {
+                printf("Clicked on route %d , position %d \n",i,j);
+                if ( cid != 0 ){
+                    printf("Alien here! \n");                
+                    return i*100 + j;            
+            }
+            }
+            
+        }
+    }
+    return -1;
+}
+
+void *alienloop(void* alien_type_v){
+    char* alien_type = (char*) alien_type_v;
+    int route_number;
+    if (*alien_type == 'N' || *alien_type == 'A' || *alien_type == 'B'){
+        route_number = A_START;
+    }else if(*alien_type == 'n' || *alien_type == 'a' || *alien_type == 'b'){
+        route_number = B_START;
+    }
+    int position = 0;
+    int sleeptime = rand()%3+1;    
+    alien_t *  current_route = routes[route_number];
+    int current_route_size = routes_sizes[route_number];
+
+    alien_t newalien = {.threadID = syscall(SYS_gettid),
+                        .speed = rand()%50,
+                        .weight = rand()%50,
+                        .time = rand()%50,
+                        .position = 0,
+                        .alienType = *alien_type}; 
+    current_route[0] = newalien;
+    while (position < current_route_size - 1){
+        printf("I am %d, position %d, sleeptime %d, next is %d\n", 1, 
+            position, sleeptime, current_route[position+1].threadID);
+        while(current_route[position + 1].threadID != 0){            
+            printf("waiting for alien %d to move from %d\n", current_route[position+1].threadID , position +1);
+            sleep(sleeptime);
+        }
+        sleep(sleeptime);
+        current_route[position+1] = current_route[position];        
+        position++;
+        current_route[position].position = position; 
+        current_route[position - 1].threadID = 0;
+    }
+    printf("Reached final position %d !, now exiting aliens...\n",position);
+    sleep(sleeptime);
+    current_route[position].threadID = 0;
+
+    Lthread_end(NULL); 
+    return NULL;
+}
+
+int generateAlien( const char* alien_type ){
+    int route_number;
+    if (*alien_type == 'N' || *alien_type == 'A' || *alien_type == 'B'){
+        route_number = A_START;
+    }else if(*alien_type == 'n' || *alien_type == 'a' || *alien_type == 'b'){
+        route_number = B_START;
+    }else{
+        return -1;
+    }
+    alien_t * startingroute = routes[route_number];
+
+    if (startingroute[0].threadID == 0){
+        startingroute[0].threadID = 1;
+        lpthread_t ptid; 
+        Lthread_create(&ptid, NULL, &alienloop, (void* )alien_type); 
+        printf("Community %c created new alien!\n", *alien_type);
+    }
+    return 0;
+}

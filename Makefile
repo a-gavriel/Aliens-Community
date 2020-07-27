@@ -52,4 +52,4 @@ Tests:
 
 
 graphics:
-	$(CC) ./$(SRC_DIR)/graphics.c -o ./$(BIN_DIR)/graphics `pkg-config --libs $(ALLEGRO_LIBS)` $(ALL_STATIC_LIB_PATH) $(LIBS_FLAG) 
+	$(CC) ./$(SRC_DIR)/alien.c ./$(SRC_DIR)/graph_points.c ./$(SRC_DIR)/graphics.c -o ./$(BIN_DIR)/graphics $(CFLAGS) `pkg-config --libs $(ALLEGRO_LIBS)` $(ALL_STATIC_LIB_PATH) $(LIBS_FLAG) 
