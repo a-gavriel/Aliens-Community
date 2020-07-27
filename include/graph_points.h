@@ -52,5 +52,13 @@ const Point B_out [23] = {{675,600},{675,630},{675,660},{705,660},{735,660},{765
 {885,660},{915,660},{945,660},{975,660},{1005,660},{1035,660},{1065,660},{1095,660},{1125,660},{1125,630},
 {1125,600},{1125,570},{1125,540},{1125,510}};
 
+const int routes_sizes[16] = {32,24,12,5,12,12,5,11,9,4,11,9,4,10,32,23};
+
+const Point *routes_coords[16] = {A_in, A_out, down_top_left, down_top_center, 
+down_top_right, up_top_left, up_top_center, up_top_right, 
+down_bottom_left, down_bottom_center, down_bottom_right, 
+up_bottom_left, up_bottom_center, up_bottom_right, B_in, B_out};
+
+
 
 #endif
