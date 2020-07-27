@@ -5,7 +5,6 @@
 #include <sys/types.h>
 
 #include "../../include/Lmutex.h"
-#include "../../include/Random.h"
 
 int Lmutex_init(lmutex_t *futx, int val)
 {

@@ -8,11 +8,13 @@
 
 #include "../include/Lpthreads.h"
 #include "../include/Lmutex.h"
-#include "../include/Random.h"
+#include "../include/Random_Generators.h"
+#include "../include/json.h"
+#include "../include/ConfigFile_Reader.h"
 
 //*****************
 //Lpthread Var
-lpthread_t lpthread[7];
+lpthread_t lpthread[8];
 lmutex_t lmutex;
 lmutex_t lmutex_trylock;
 //*****************
@@ -59,6 +61,7 @@ void Lpthread_Test()
     printf("Value of shared var x: %d and y: %d and z: %d \n", x,y,z);
 }
 
+int a = 0;
 //Test Lmutex Try Lock
 int *Lpthread_Test_trylock_Aux(int id)
 {
@@ -69,7 +72,8 @@ int *Lpthread_Test_trylock_Aux(int id)
         {
             printf("Thread %d : Capture the Lock \n", id);
             i++;
-            printf("Thread %d : Increment the counter: i = %d \n", id,i);
+            a++;
+            printf("Thread %d : Increment the counter: i = %d \n", id,a);
             Lmutex_unlock(&lmutex_trylock);
         }
         else
@@ -81,10 +85,37 @@ int *Lpthread_Test_trylock_Aux(int id)
 
 void Lpthread_Test_trylock()
 {
+    printf("Final Value need to be: %d \n", 10);
     Lthread_create(&lpthread[5], NULL, Lpthread_Test_trylock_Aux, (int *)1);
     Lthread_create(&lpthread[6], NULL, Lpthread_Test_trylock_Aux, (int *)2);
     Lthread_join(lpthread[5], NULL);
     Lthread_join(lpthread[6], NULL);
+}
+
+//Detach Test Code
+
+int Lpthread_Test_Detach_Aux()
+{
+    for(int i = 0; i<5; i++)
+    {
+        sleep(1);
+    }
+    return EXIT_SUCCESS;
+}
+
+int Lpthread_Test_Detach()
+{
+    printf("Run Thread 1 \n");
+    Lthread_create(&lpthread[7], NULL, Lpthread_Test_Detach_Aux, NULL);
+    printf("Detach Thread 1 \n");
+    Lthread_detach(lpthread[7]);
+    printf("Try Join Thread 1 \n");
+    if(Lthread_join(lpthread[7], NULL) == -2)
+    {
+        printf("Can't Join Thread 1 was detached \n");
+    }
+    sleep(3);
+    return EXIT_SUCCESS;
 }
 
 //Pthreads Test Code
@@ -123,8 +154,36 @@ void Pthread_Test()
 void Test_ramdom_generators()
 {
     srand(time(NULL));
-    printf("Rand Number: %d \n", Get_random_value(100));
-    printf("Rand String: %s \n", Get_random_string(10));
+    printf("Rand Number: %d \n", get_random_int(100));
+    printf("Rand String: %s \n", get_random_string(10));
+}
+
+void TestJson()
+{
+    bridge_t bridgeI;
+    alien_beta_t alienB;
+    alien_normal_t alienN;
+    aliens_generator_t alienG;
+    //char *file =  "bridge_config_file_I.json";
+    Read_bridge_configFile(FILE_NAME_BRIDGE_I, &bridgeI);
+    Read_alien_normal_configFile(FILE_NAME_ALIEN_N, &alienN);
+    Read_alien_beta_configFile(FILE_NAME_ALIEN_B, &alienB);
+    Read_aliens_generator_configFile(FILE_NAME_ALIEN_GENERATOR, &alienG);
+    printf("Bridge Config File \n");
+    printf("\t Size: %d \n", bridgeI.size);
+    printf("\t Max Weigth: %d \n", bridgeI.max_weigth);
+    printf("\t Bridge: %d \n", bridgeI.bridge_type);
+    printf("\t Scheduler: %d \n", bridgeI.scheduler_type);
+    printf("\t QueueSize: %d \n", bridgeI.queue_size);
+    printf("Alien Normal Config File \n");
+    printf("\t Speed: %d \n", alienN.speed);
+    printf("Alien Beta Config File \n");
+    printf("\t Execution Time: %d \n", alienB.execution_time);
+    printf("Aliens Generator Config File \n");
+    printf("\t Normal Percentage : %d \n", alienG.normal);
+    printf("\t Beta Percentage : %d \n", alienG.beta);
+    printf("\t Alfa Percentage : %d \n", alienG.alfa);
+    printf("\t Mean Time : %d \n", alienG.mean);
 }
 
 int main()
@@ -149,7 +208,13 @@ int main()
     Lpthread_Test_trylock();
     Lmutex_destroy(&lmutex_trylock);
     printf("****************************** \n");
+    printf("Run Detach Test \n");
+    Lpthread_Test_Detach();
+    printf("****************************** \n");
     printf("Run Random Generators Test \n");
     Test_ramdom_generators();
+    printf("****************************** \n");
+    printf("Run Json Test \n");
+    TestJson();
     return EXIT_SUCCESS;
 }

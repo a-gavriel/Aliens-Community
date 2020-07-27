@@ -40,6 +40,7 @@ typedef struct lpthread_private
     void *returnValue;                       /* The return value that thread returns. */
     struct lpthread_private *blockedForJoin; /* Thread blocking on this thread */
     struct lpthread_private *prev, *next;
+    int joinable;                            /*1 = Can Join, 0 = Can't Join*/
 
 } lpthread_private_t;
 
