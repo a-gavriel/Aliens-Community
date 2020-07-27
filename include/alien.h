@@ -1,7 +1,13 @@
 #ifndef _ALIEN_H_
 #define _ALIEN_H_
 
-#include <pthread.h> 
+
+#define _GNU_SOURCE
+#include <sys/syscall.h>
+#include <sys/types.h>
+#include <unistd.h>
+//#include <pthread.h> 
+#include "Lpthreads.h"
 #include "graph_points.h"
 
 const char alienTypes[3] = {'N','A','B'};
@@ -10,7 +16,7 @@ const int starting_routes[2] = {1,15};
 
 // Aliens struct
 typedef struct aliens {
-	pthread_t threadID;  
+	pid_t threadID;  
     int speed;
     int weight;
     int time;
@@ -76,8 +82,8 @@ void* alienloop(void* route_number_ptr){
     int x = route_coords[0].x;
     int y = route_coords[0].y;
 
-    pthread_t tid = pthread_self();
-    alien_t newalien = {.threadID = pthread_self(),
+    //pthread_t tid = pthread_self();
+    alien_t newalien = {.threadID = syscall(SYS_gettid),
                         .speed = rand()%50,
                         .weight = rand()%50,
                         .time = rand()%50,
@@ -86,7 +92,7 @@ void* alienloop(void* route_number_ptr){
                         .alienType = rand()%3}; 
     current_route[0] = newalien;
     while (position < current_route_size - 1){
-        printf("I am %ld, position %d, sleeptime %d, next is %ld\n", tid, 
+        printf("I am %ld, position %d, sleeptime %d, next is %ld\n", 1, 
             position, sleeptime, current_route[position+1].threadID);
         while(current_route[position + 1].threadID != 0){            
             printf("waiting for alien %ld to move from %d\n", current_route[position+1].threadID , position +1);
@@ -101,7 +107,7 @@ void* alienloop(void* route_number_ptr){
     sleep(sleeptime);
     current_route[position].threadID = 0;
 
-    pthread_exit(NULL); 
+    Lthread_end(NULL); 
 }
 
 int generateAlien( char community ){
@@ -115,8 +121,8 @@ int generateAlien( char community ){
 
     if (startingroute[0].threadID == 0){
         startingroute[0].threadID = 1;
-        pthread_t ptid; 
-        pthread_create(&ptid, NULL, &alienloop, (void* )routeNumber); 
+        lpthread_t ptid; 
+        Lthread_create(&ptid, NULL, &alienloop, (void* )routeNumber); 
         printf("Community %c created new alien!\n", community);
     }
 }
