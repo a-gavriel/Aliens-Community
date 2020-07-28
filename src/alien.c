@@ -83,6 +83,8 @@ void *alienloop(void* alien_type_v){
     usleep(sleeptime);
     if (direction == 0){
         int Atop[3]  = {2,3,4};
+        int Abottom[3] = {8,9,10};
+
         int rand_select = rand()%3;
         int new_route_num = Atop[rand_select];
         alien_t *  new_route = routes[new_route_num];
@@ -115,11 +117,15 @@ void *alienloop(void* alien_type_v){
         // Reached bridge!
         sleep(1);
 
-        int Abottom[3] = {8,9,10};
-        new_route_num = Abottom[rand_select];
-        new_route = routes[new_route_num];
         // Force copy outside bridge
         
+        new_route_num = Abottom[rand_select];
+        new_route = routes[new_route_num];
+        
+        // Check if route is full
+        while(new_route[0].threadID != 0){
+            usleep(sleeptime);
+        }
         
 
     }

@@ -12,6 +12,7 @@
 
 #include "../include/graph_points.h"
 #include "../include/alien.h"
+#include "../include/bridge.h"
 
 alien_t list_A_in [32] = {0};
 alien_t list_A_out [24] = {0};
@@ -21,9 +22,9 @@ alien_t list_down_top_right [12] = {0};
 alien_t list_up_top_left [12] = {0};
 alien_t list_up_top_center [5] = {0};
 alien_t list_up_top_right [11] = {0};
-//alien_t list_bridge_left [] = {0};
-//alien_t list_bridge_center [] = {0};
-//alien_t list_bridge_right [] = {0};
+alien_t list_bridge_left [5] = {0};
+alien_t list_bridge_center [5] = {0};
+alien_t list_bridge_right [5] = {0};
 alien_t list_down_bottom_left [9] = {0};
 alien_t list_down_bottom_center [4] = {0};
 alien_t list_down_bottom_right [11] = {0};
@@ -32,6 +33,8 @@ alien_t list_up_bottom_center [4] = {0};
 alien_t list_up_bottom_right [10] = {0};
 alien_t list_B_in [32] = {0};
 alien_t list_B_out [23] = {0};
+
+bridge_params_t left_bridge = {0,0,100,-1};
 
 void must_init(bool test, const char *description)
 {
@@ -170,6 +173,7 @@ int main()
                     frame = 0;
                     generateAlien(alienTypes+rand()%6);
                 }
+                Survival(&left_bridge);
                 redraw = true;
                 ++frame;
                 break;

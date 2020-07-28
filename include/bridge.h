@@ -7,3 +7,7 @@ typedef struct bridge_params
 } bridge_params_t;
 
 void Survival(bridge_params_t *bridge);
+
+void Survival_AUX_L(bridge_params_t *bridge);
+
+int Has_space(bridge_params_t *bridge, alien_t alien);
