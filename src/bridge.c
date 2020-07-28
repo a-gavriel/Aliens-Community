@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <signal.h>
 
 #include "../include/alien.h"
 #include "../include/bridge.h"
@@ -51,6 +52,8 @@ void BridgeMovements()
         default:
             break;
     }
+
+    Move();
 }
 
 void Survival(bridge_params_t *bridge)
@@ -79,21 +82,25 @@ void Survival_AUX_L(bridge_params_t *bridge)
 {
     if(bridge->count == 0)
     {
-        if(aliens_A_top_left[11].threadID != 0)
+        if(aliens_A_top_left[11].threadID != 0 && aliens_bridge_left[0].threadID != 0)
         {
             usleep(aliens_A_bottom_left[11].time);
+            kill(aliens_A_top_left[11].threadID, SIGSTOP);
             aliens_bridge_left[0] = aliens_A_top_left[11];
+            bridge->count++;
+            bridge->dir = 0;
             aliens_bridge_left[0].position = 0;
             aliens_A_top_left[11].threadID = 0;
         }
     }
     else if(bridge->dir == 0 && bridge->count > 0)
     {
-        if(aliens_A_top_left[11].threadID != 0)
+        if(aliens_A_top_left[11].threadID != 0 && aliens_bridge_left[0].threadID != 0)
         {
             if(Has_space(bridge, aliens_A_top_left[11]) == EXIT_SUCCESS)
             {
                 usleep(aliens_A_bottom_left[11].time);
+                kill(aliens_A_top_left[11].threadID, SIGSTOP);
                 aliens_bridge_left[0] = aliens_A_top_left[11];
                 aliens_bridge_left[0].position = 0;
                 aliens_A_top_left[11].threadID = 0;
@@ -152,6 +159,11 @@ void Survival_AUX_C(bridge_params_t *bridge)
             }
         }
     }
+}
+
+void Move()
+{
+
 }
 
 int Has_space(bridge_params_t *bridge, alien_t alien)

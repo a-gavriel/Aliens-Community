@@ -18,5 +18,5 @@ void Survival(bridge_params_t *bridge);
 void Survival_AUX_L(bridge_params_t *bridge);
 void Survival_AUX_R(bridge_params_t *bridge);
 void Survival_AUX_C(bridge_params_t *bridge);
-
+void Move();
 int Has_space(bridge_params_t *bridge, alien_t alien);
