@@ -186,10 +186,11 @@ void Move()
         aliens_bridge_left[4].threadID = 0;
         kill(aliens_A_top_center[4].threadID, SIGCONT);
     }
-    for(int i=3; i!=0; i--)
+    for(int i=3; i>=0; i--)
     {
+
         if(aliens_bridge_left[i].threadID != 0 && aliens_bridge_left[i+1].threadID == 0)
-        {
+        {            
             aliens_bridge_left[i+1] = aliens_bridge_left[i];
             aliens_bridge_left[i+1].position = i+1;
             aliens_bridge_left[i].threadID = 0;

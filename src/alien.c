@@ -100,7 +100,7 @@ void *alienloop(void* alien_type_v){
     int Bbottom[3]  = {11,12,13};
     int Btop[3] = {5,6,7};
 
-    int rand_select = 0;//rand()%3;
+    int rand_select = rand()%3;
     int new_route_num;
     if (direction == 0){
         new_route_num = Atop[rand_select];

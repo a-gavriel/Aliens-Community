@@ -182,6 +182,18 @@ int main()
                     
                 if(key[ALLEGRO_KEY_ESCAPE])
                     done = true;
+                if(key[ALLEGRO_KEY_1])
+                    generateAlien(alienTypes);
+                if(key[ALLEGRO_KEY_2])
+                    generateAlien(alienTypes+1);
+                if(key[ALLEGRO_KEY_3])
+                    generateAlien(alienTypes+2);
+                if(key[ALLEGRO_KEY_4])
+                    generateAlien(alienTypes+3);
+                if(key[ALLEGRO_KEY_5])
+                    generateAlien(alienTypes+4);
+                if(key[ALLEGRO_KEY_6])
+                    generateAlien(alienTypes+5);
 
                 for(int i = 0; i < ALLEGRO_KEY_MAX; i++)
                     key[i] = 0;
