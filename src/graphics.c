@@ -13,6 +13,7 @@
 #include "../include/graph_points.h"
 #include "../include/alien.h"
 #include "../include/bridge.h"
+#include "../include/ConfigFile_Reader.h"
 
 alien_t list_A_in [32] = {0};
 alien_t list_A_out [24] = {0};
@@ -33,8 +34,6 @@ alien_t list_up_bottom_center [4] = {0};
 alien_t list_up_bottom_right [10] = {0};
 alien_t list_B_in [32] = {0};
 alien_t list_B_out [23] = {0};
-
-bridge_params_t left_bridge = {0,0,100,-1};
 
 void must_init(bool test, const char *description)
 {
@@ -88,6 +87,13 @@ void draw_aliens(ALLEGRO_BITMAP* alien1, ALLEGRO_BITMAP* alien2, ALLEGRO_BITMAP*
 
 int main()
 {
+    //Read all config files
+    Read_program_config();
+    //Bridges
+    left_bridge = (bridge_params_t){0,0,bridgeL.max_weigth,-1,bridgeL.bridge_type};
+    right_bridge = (bridge_params_t){0,0,bridgeR.max_weigth,1,bridgeL.bridge_type};
+    center_bridge = (bridge_params_t){0,0,bridgeC.max_weigth,0,bridgeL.bridge_type};
+
     must_init(al_init(), "allegro");
     must_init(al_install_keyboard(), "keyboard");
 
@@ -173,7 +179,7 @@ int main()
                     frame = 0;
                     generateAlien(alienTypes+rand()%6);
                 }
-                Survival(&left_bridge);
+                BridgeMovements();
                 redraw = true;
                 ++frame;
                 break;

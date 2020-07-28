@@ -5,15 +5,63 @@
 #include "../include/alien.h"
 #include "../include/bridge.h"
 
-void Survival(bridge_params_t *bridge)
+void BridgeMovements()
 {
-    switch (bridge->type)
+    switch (left_bridge.type)
     {
-        case 0: //Center          
+        case 0: //0 = Algorithm Y          
 
             break;
-        case 1: //Right          
+        case 1: //1 = Algorithm Sem          
 
+            break;
+        case 2: //2 = Algorithm Survival          
+            Survival(&left_bridge);
+        break;
+        default:
+            break;
+    }
+
+    switch (center_bridge.type)
+    {
+        case 0: //0 = Algorithm Y          
+
+            break;
+        case 1: //1 = Algorithm Sem          
+
+            break;
+        case 2: //2 = Algorithm Survival          
+            Survival(&center_bridge);
+        break;
+        default:
+            break;
+    }
+
+    switch (right_bridge.type)
+    {
+        case 0: //0 = Algorithm Y          
+
+            break;
+        case 1: //1 = Algorithm Sem          
+
+            break;
+        case 2: //2 = Algorithm Survival          
+            Survival(&right_bridge);
+        break;
+        default:
+            break;
+    }
+}
+
+void Survival(bridge_params_t *bridge)
+{
+    switch (bridge->position)
+    {
+        case 0: //Center          
+        Survival_AUX_C(bridge);
+            break;
+        case 1: //Right          
+        Survival_AUX_R(bridge);
             break;
         case -1: //Left          
             Survival_AUX_L(bridge);
@@ -23,13 +71,17 @@ void Survival(bridge_params_t *bridge)
     }
 }
 
+//kill(array_pids[i], SIGCONT);
+//sleep(1);
+//kill(array_pids[i], SIGSTOP);
+
 void Survival_AUX_L(bridge_params_t *bridge)
 {
-    usleep(aliens_A_bottom_left[11].time);
     if(bridge->count == 0)
     {
         if(aliens_A_top_left[11].threadID != 0)
         {
+            usleep(aliens_A_bottom_left[11].time);
             aliens_A_bottom_left[0] = aliens_A_top_left[11];
             aliens_A_bottom_left[0].position = 0;
             aliens_A_top_left[11].threadID = 0;
@@ -44,6 +96,58 @@ void Survival_AUX_L(bridge_params_t *bridge)
                 aliens_A_bottom_left[0] = aliens_A_top_left[11];
                 aliens_A_bottom_left[0].position = 0;
                 aliens_A_top_left[11].threadID = 0;
+            }
+        }
+    }
+}
+
+void Survival_AUX_R(bridge_params_t *bridge)
+{
+    if(bridge->count == 0)
+    {
+        if(aliens_A_top_right[11].threadID != 0)
+        {
+            usleep(aliens_A_top_right[11].time);
+            aliens_A_bottom_right[0] = aliens_A_top_right[11];
+            aliens_A_bottom_right[0].position = 0;
+            aliens_A_top_right[11].threadID = 0;
+        }
+    }
+    else if(bridge->dir == 0 && bridge->count > 0)
+    {
+        if(aliens_A_top_right[11].threadID != 0)
+        {
+            if(Has_space(bridge, aliens_A_top_right[11]) == EXIT_SUCCESS)
+            {
+                aliens_A_bottom_right[0] = aliens_A_top_right[11];
+                aliens_A_bottom_right[0].position = 0;
+                aliens_A_top_right[11].threadID = 0;
+            }
+        }
+    }
+}
+
+void Survival_AUX_C(bridge_params_t *bridge)
+{
+    if(bridge->count == 0)
+    {
+        if(aliens_A_top_center[5].threadID != 0)
+        {
+            usleep(aliens_A_top_center[5].time);
+            aliens_A_bottom_center[0] = aliens_A_top_center[5];
+            aliens_A_bottom_center[0].position = 0;
+            aliens_A_top_center[5].threadID = 0;
+        }
+    }
+    else if(bridge->dir == 0 && bridge->count > 0)
+    {
+        if(aliens_A_top_center[5].threadID != 0)
+        {
+            if(Has_space(bridge, aliens_A_top_center[5]) == EXIT_SUCCESS)
+            {
+                aliens_A_bottom_center[0] = aliens_A_top_center[5];
+                aliens_A_bottom_center[0].position = 0;
+                aliens_A_top_center[5].threadID = 0;
             }
         }
     }
