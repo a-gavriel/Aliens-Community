@@ -141,5 +141,5 @@ int Read_program_config()
     Read_bridge_configFile(FILE_NAME_BRIDGE_D, &bridgeR);
     Read_alien_normal_configFile(FILE_NAME_ALIEN_N, &alienN);
     Read_alien_beta_configFile(FILE_NAME_ALIEN_B, &alienB);
-    Read_aliens_generator_configFile(FILE_NAME_ALIEN_B, &aliensG);
+    Read_aliens_generator_configFile(FILE_NAME_ALIEN_GENERATOR, &aliensG);
 }
