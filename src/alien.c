@@ -46,13 +46,16 @@ int getAlien(int x, int y){
 void *alienloop(void* alien_type_v){
     char* alien_type = (char*) alien_type_v;
     int route_number;
+    int direction;
     if (*alien_type == 'N' || *alien_type == 'A' || *alien_type == 'B'){
         route_number = A_START;
+        direction = 0;
     }else if(*alien_type == 'n' || *alien_type == 'a' || *alien_type == 'b'){
         route_number = B_START;
+        direction = 1;
     }
     int position = 0;
-    int sleeptime = rand()%3+1;    
+    int sleeptime = rand()%300000+100000;    
     alien_t *  current_route = routes[route_number];
     int current_route_size = routes_sizes[route_number];
 
@@ -64,20 +67,62 @@ void *alienloop(void* alien_type_v){
                         .alienType = *alien_type}; 
     current_route[0] = newalien;
     while (position < current_route_size - 1){
-        printf("I am %d, position %d, sleeptime %d, next is %d\n", 1, 
-            position, sleeptime, current_route[position+1].threadID);
+        //printf("I am %d, position %d, sleeptime %d, next is %d\n", 1, 
+        //    position, sleeptime, current_route[position+1].threadID);
         while(current_route[position + 1].threadID != 0){            
-            printf("waiting for alien %d to move from %d\n", current_route[position+1].threadID , position +1);
-            sleep(sleeptime);
+            //printf("waiting for alien %d to move from %d\n", current_route[position+1].threadID , position +1);
+            usleep(sleeptime);
         }
-        sleep(sleeptime);
+        usleep(sleeptime);
         current_route[position+1] = current_route[position];        
         position++;
         current_route[position].position = position; 
         current_route[position - 1].threadID = 0;
     }
     printf("Reached final position %d !, now exiting aliens...\n",position);
-    sleep(sleeptime);
+    usleep(sleeptime);
+    if (direction == 0){
+        int Atop[3]  = {2,3,4};
+        int rand_select = rand()%3;
+        int new_route_num = Atop[rand_select];
+        alien_t *  new_route = routes[new_route_num];
+        // Selection Atop route
+        while(new_route[0].threadID != 0){
+            usleep(sleeptime);
+            rand_select = rand()%3;
+            new_route_num = Atop[rand_select];
+            new_route = routes[new_route_num];
+        }
+        // Entering Atop
+        new_route[0] = current_route[position];
+        current_route[position].threadID = 0;
+        current_route = new_route;
+        route_number = new_route_num;
+        position = 0;
+        new_route[0].position = 0;
+
+        current_route_size = routes_sizes[route_number];        
+        while (position < current_route_size - 1){
+            while(current_route[position + 1].threadID != 0){                        
+                usleep(sleeptime);
+            }
+            usleep(sleeptime);
+            current_route[position+1] = current_route[position];        
+            position++;
+            current_route[position].position = position; 
+            current_route[position - 1].threadID = 0;
+        }
+        // Reached bridge!
+        sleep(1);
+
+        int Abottom[3] = {8,9,10};
+        new_route_num = Abottom[rand_select];
+        new_route = routes[new_route_num];
+        // Force copy outside bridge
+        
+        
+
+    }
     current_route[position].threadID = 0;
 
     Lthread_end(NULL); 
