@@ -13,6 +13,7 @@
 #include "../include/graph_points.h"
 #include "../include/alien.h"
 #include "../include/bridge.h"
+#include "../include/Random_Generators.h"
 #include "../include/ConfigFile_Reader.h"
 
 alien_t list_A_in [32] = {0};
@@ -94,6 +95,8 @@ int main()
     right_bridge = (bridge_params_t){0,0,bridgeR.max_weigth,1,bridgeL.bridge_type};
     center_bridge = (bridge_params_t){0,0,bridgeC.max_weigth,0,bridgeL.bridge_type};
 
+    init_mutex();
+
     must_init(al_init(), "allegro");
     must_init(al_install_keyboard(), "keyboard");
 
@@ -153,7 +156,8 @@ int main()
     // Initializes random number generator
     srand((unsigned) time(&t));
     uint frame = 0;
-    uint f_new_alien = rand()%90+30;
+    uint randomexp = expRandom(2);
+    uint f_new_alien = randomexp*30/1000000;
     while(1)
     {
         al_wait_for_event(queue, &event);
@@ -177,7 +181,10 @@ int main()
                     key[i] = 0;
                 if(frame == f_new_alien){
                     frame = 0;
-                    generateAlien(alienTypes+rand()%6);
+                    generateAlien(alienTypes);//+rand()%6);
+                    randomexp = expRandom(2);
+                    f_new_alien = randomexp*30/1000000;
+                    printf("Next alien in %d\n",f_new_alien/30);
                 }
                 BridgeMovements();
                 redraw = true;

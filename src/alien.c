@@ -2,9 +2,11 @@
 #include <sys/syscall.h>
 //#include <sys/types.h>
 //#include <unistd.h>
+#include <signal.h>
 
 #include "../include/alien.h"
 #include "../include/Lpthreads.h"
+
 #include "../include/graph_points.h"
 
 #define A_START 1
@@ -12,12 +14,20 @@
 
 const char alienTypes[6] = {'N','A','B','n','a','b'};
 
+
+
 alien_t *routes[19] = { aliens_A_in, aliens_A_out, aliens_A_top_left, 
 aliens_A_top_center, aliens_A_top_right, aliens_B_top_left, 
 aliens_B_top_center, aliens_B_top_right, aliens_A_bottom_left, 
 aliens_A_bottom_center, aliens_A_bottom_right, aliens_B_bottom_left, 
 aliens_B_bottom_center, aliens_B_bottom_right, aliens_B_in, aliens_B_out,
 aliens_bridge_left, aliens_bridge_center, aliens_bridge_right};
+
+int init_mutex(){
+    Lmutex_init(&lmutex, 1);
+    return 1;
+}
+
 
 int getAlien(int x, int y){
     printf("Coords %d,%d \n",x,y);
@@ -33,7 +43,9 @@ int getAlien(int x, int y){
             if (cx < x && x < cx+30 && cy < y && y < cy+30 ) {
                 printf("Clicked on route %d , position %d \n",i,j);
                 if ( cid != 0 ){
-                    printf("Alien here! \n");                
+                    //printf("Alien here! \n");                
+                    kill(cid,SIGKILL);
+                    currentRoute[j].threadID = 0;
                     return i*100 + j;            
             }
             }
@@ -88,7 +100,7 @@ void *alienloop(void* alien_type_v){
     int Bbottom[3]  = {11,12,13};
     int Btop[3] = {5,6,7};
 
-    int rand_select = rand()%3;
+    int rand_select = 0;//rand()%3;
     int new_route_num;
     if (direction == 0){
         new_route_num = Atop[rand_select];
@@ -148,12 +160,24 @@ void *alienloop(void* alien_type_v){
         printf("crossing bidge %d, %d\n",new_route_num,new_route[0].position );
         usleep(sleeptime);
     }
-
+    Lmutex_lock(&lmutex);
     current_route = new_route;
     route_number = new_route_num;
     position = 0;
     current_route_size = routes_sizes[route_number];   
     
+
+    usleep(sleeptime);
+    while(current_route[position + 1].threadID != 0){                        
+        usleep(sleeptime);
+    }            
+    current_route[position+1] = current_route[position];        
+    position++;
+    current_route[position].position = position; 
+    current_route[position - 1].threadID = 0;
+
+    Lmutex_unlock(&lmutex);
+
     while (position < current_route_size - 1){
         usleep(sleeptime);
         while(current_route[position + 1].threadID != 0){                        

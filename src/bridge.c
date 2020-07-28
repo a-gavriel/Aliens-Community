@@ -82,7 +82,7 @@ void Survival_AUX_L(bridge_params_t *bridge)
 {
     if(bridge->count == 0)
     {
-        if(aliens_A_top_left[11].threadID != 0 && aliens_bridge_left[0].threadID != 0)
+        if(aliens_A_top_left[11].threadID != 0 && aliens_bridge_left[0].threadID == 0)
         {
             usleep(aliens_A_bottom_left[11].time);
             kill(aliens_A_top_left[11].threadID, SIGSTOP);
@@ -95,7 +95,7 @@ void Survival_AUX_L(bridge_params_t *bridge)
     }
     else if(bridge->dir == 0 && bridge->count > 0)
     {
-        if(aliens_A_top_left[11].threadID != 0 && aliens_bridge_left[0].threadID != 0)
+        if(aliens_A_top_left[11].threadID != 0 && aliens_bridge_left[0].threadID == 0)
         {
             if(Has_space(bridge, aliens_A_top_left[11]) == EXIT_SUCCESS)
             {

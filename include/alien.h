@@ -5,7 +5,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-
+#include "../include/Lmutex.h"
 // Aliens struct
 typedef struct aliens {
 	pid_t threadID;  
@@ -45,5 +45,12 @@ int getAlien(int x, int y);
 void *alienloop(void* route_number_ptr);
 
 int generateAlien( const char* alien_type );
-    
+
+
+lmutex_t lmutex;
+
+
+int init_mutex();
+
+
 #endif
