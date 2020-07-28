@@ -44,7 +44,7 @@ typedef struct aliens_generator
     int normal;     /*Percentage*/
     int beta;       /*Percentage*/
     int alfa;       /*Percentage*/
-    int mean;       /*micro seconds*/
+    int mean;       /*seconds*/
 
 } aliens_generator_t;
 

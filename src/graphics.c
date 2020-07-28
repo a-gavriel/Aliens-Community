@@ -49,7 +49,7 @@ void draw_aliens(ALLEGRO_BITMAP* alien1, ALLEGRO_BITMAP* alien2, ALLEGRO_BITMAP*
     float cx,cy;
     char alienType;
     const Point* route_coords;
-    for (int i = 0; i< 16; ++i){
+    for (int i = 0; i< 19; ++i){
         alien_t* currentRoute = routes[i];        
         for (int j = 0; j < routes_sizes[i] ; ++j){
             cid = currentRoute[j].threadID;           
@@ -144,7 +144,8 @@ int main()
     y = 100;
 
     int counter = 0;
-
+    
+    
     #define KEY_SEEN     1
     #define KEY_RELEASED 2
 
@@ -156,8 +157,13 @@ int main()
     // Initializes random number generator
     srand((unsigned) time(&t));
     uint frame = 0;
-    uint randomexp = expRandom(2);
+    printf("%d,%d,%d\n",aliensG.alfa,aliensG.beta,aliensG.normal);
+    printf("randome seed %d\n",aliensG.mean);
+    double randomseed = (double) aliensG.mean;
+    uint randomexp = expRandom(randomseed);
     uint f_new_alien = randomexp*30/1000000;
+    printf("Next alien in %d\n",f_new_alien/30);
+    int randint;
     while(1)
     {
         al_wait_for_event(queue, &event);
@@ -181,8 +187,16 @@ int main()
                     key[i] = 0;
                 if(frame == f_new_alien){
                     frame = 0;
-                    generateAlien(alienTypes);//+rand()%6);
-                    randomexp = expRandom(2);
+                    randint = rand()%100;
+                    if (randint < aliensG.normal){
+                        generateAlien(alienTypes+(rand()%2)*3);
+                    }else if (randint < (aliensG.normal + aliensG.alfa )){
+                        generateAlien(alienTypes+1+(rand()%2)*3);
+                    }else{
+                        generateAlien(alienTypes+2+(rand()%2)*3);
+                    }
+                    
+                    randomexp = expRandom(randomseed);
                     f_new_alien = randomexp*30/1000000;
                     printf("Next alien in %d\n",f_new_alien/30);
                 }
