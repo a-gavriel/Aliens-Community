@@ -12,11 +12,12 @@
 
 const char alienTypes[6] = {'N','A','B','n','a','b'};
 
-alien_t *routes[16] = { aliens_A_in, aliens_A_out, aliens_A_top_left, 
+alien_t *routes[19] = { aliens_A_in, aliens_A_out, aliens_A_top_left, 
 aliens_A_top_center, aliens_A_top_right, aliens_B_top_left, 
 aliens_B_top_center, aliens_B_top_right, aliens_A_bottom_left, 
 aliens_A_bottom_center, aliens_A_bottom_right, aliens_B_bottom_left, 
-aliens_B_bottom_center, aliens_B_bottom_right, aliens_B_in, aliens_B_out};
+aliens_B_bottom_center, aliens_B_bottom_right, aliens_B_in, aliens_B_out,
+aliens_bridge_left, aliens_bridge_center, aliens_bridge_right};
 
 int getAlien(int x, int y){
     printf("Coords %d,%d \n",x,y);

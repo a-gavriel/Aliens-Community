@@ -26,9 +26,9 @@ alien_t aliens_A_top_right [12];
 alien_t aliens_B_top_left [12];
 alien_t aliens_B_top_center [5];
 alien_t aliens_B_top_right [11];
-//alien_t aliens_bridge_left [];
-//alien_t aliens_bridge_center [];
-//alien_t aliens_bridge_right [];
+alien_t aliens_bridge_left [5];
+alien_t aliens_bridge_center [5];
+alien_t aliens_bridge_right [5];
 alien_t aliens_A_bottom_left [9];
 alien_t aliens_A_bottom_center [4];
 alien_t aliens_A_bottom_right [11];
@@ -38,7 +38,7 @@ alien_t aliens_B_bottom_right [10];
 alien_t aliens_B_in [32];
 alien_t aliens_B_out [23];
 
-alien_t *routes[16];
+alien_t *routes[19];
 
 int getAlien(int x, int y);
 

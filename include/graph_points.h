@@ -44,9 +44,9 @@ const Point B_in [32];
 
 const Point B_out [23];
 
-const int routes_sizes[16];
+const int routes_sizes[19];
 
-const Point *routes_coords[16];
+const Point *routes_coords[19];
 
 
 

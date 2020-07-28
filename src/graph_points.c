@@ -21,11 +21,11 @@ const Point B_top_center [5] = {{675, 290}, {675, 260}, {675, 230}, {675, 200}, 
 
 const Point B_top_right [11] = {{880, 290}, {880, 260}, {880, 230}, {880, 200}, {880, 170}, {880, 140}, {850, 140}, {820, 140}, {790, 140}, {760, 140}, {730, 140}};
 
-//const Point bridge_left [] = {{470,320},{470,350},{470,380},{470,410},{470,440}};
+const Point bridge_left [] = {{470,320},{470,350},{470,380},{470,410},{470,440}};
 
-//const Point bridge_center [] = {{860,320},{860,350},{860,380},{860,410},{860,440}};
+const Point bridge_center [] = {{860,320},{860,350},{860,380},{860,410},{860,440}};
 
-//const Point bridge_right [] = {{660,320},{660,350},{660,380},{660,410},{660,440}};
+const Point bridge_right [] = {{660,320},{660,350},{660,380},{660,410},{660,440}};
 
 const Point A_bottom_left [9] = {{460,470},{460,500},{460,530},{460,560},{460,590},{490,590},{520,590},{550,590},{580,590}};
 
@@ -47,11 +47,11 @@ const Point B_out [23] = {{1125, 510}, {1125, 540}, {1125, 570}, {1125, 600}, {1
 {1065, 660}, {1035, 660}, {1005, 660}, {975, 660}, {945, 660}, {915, 660}, {885, 660}, {855, 660}, {825, 660}, 
 {795, 660}, {765, 660}, {735, 660}, {705, 660}, {675, 660}, {675, 630}, {675, 600}};
 
-const int routes_sizes[16] = {32,24,12,5,12,12,5,11,9,4,11,9,4,10,32,23};
+const int routes_sizes[19] = {32,24,12,5,12,12,5,11,9,4,11,9,4,10,32,23,5,5,5};
 
-const Point *routes_coords[16] = {A_in, A_out, A_top_left, A_top_center, 
+const Point *routes_coords[19] = {A_in, A_out, A_top_left, A_top_center, 
 A_top_right, B_top_left, B_top_center, B_top_right, 
 A_bottom_left, A_bottom_center, A_bottom_right, 
-B_bottom_left, B_bottom_center, B_bottom_right, B_in, B_out};
+B_bottom_left, B_bottom_center, B_bottom_right, B_in, B_out, bridge_left, bridge_center, bridge_right};
 
 
