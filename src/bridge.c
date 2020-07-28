@@ -131,23 +131,23 @@ void Survival_AUX_C(bridge_params_t *bridge)
 {
     if(bridge->count == 0)
     {
-        if(aliens_A_top_center[5].threadID != 0)
+        if(aliens_A_top_center[4].threadID != 0)
         {
-            usleep(aliens_A_top_center[5].time);
-            aliens_A_bottom_center[0] = aliens_A_top_center[5];
+            usleep(aliens_A_top_center[4].time);
+            aliens_A_bottom_center[0] = aliens_A_top_center[4];
             aliens_A_bottom_center[0].position = 0;
-            aliens_A_top_center[5].threadID = 0;
+            aliens_A_top_center[4].threadID = 0;
         }
     }
     else if(bridge->dir == 0 && bridge->count > 0)
     {
-        if(aliens_A_top_center[5].threadID != 0)
+        if(aliens_A_top_center[4].threadID != 0)
         {
-            if(Has_space(bridge, aliens_A_top_center[5]) == EXIT_SUCCESS)
+            if(Has_space(bridge, aliens_A_top_center[4]) == EXIT_SUCCESS)
             {
-                aliens_A_bottom_center[0] = aliens_A_top_center[5];
+                aliens_A_bottom_center[0] = aliens_A_top_center[4];
                 aliens_A_bottom_center[0].position = 0;
-                aliens_A_top_center[5].threadID = 0;
+                aliens_A_top_center[4].threadID = 0;
             }
         }
     }
