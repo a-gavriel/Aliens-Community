@@ -1,32 +1,87 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "../include/alien.h"
-
-typedef struct bridge_params
-{
-    int count;  /*Number of aliens inside the bridge*/
-    int dir;    /*0 = Up to Botton, 1 = Botton to Up*/
-} bridge_params_t;
+#include "../include/bridge.h"
 
 void Survival(bridge_params_t *bridge)
 {
-    //int size = sizeof(bridge->) / sizeof(listUp[0]);
-
-    if(bridge->dir == 0 && bridge->count > 0) //Bajando y con elementos en el puento
+    switch (bridge->type)
     {
-            if(bridge->listUpA[i]->position == 0 && bridge->listUpA[i]->threadID != -1)
-            {
-                //Eliminarlo de la lista
-                //Pasarlo a la lista del puente
-                bridge->listBridge[]
-                dir = 1;
-    }
-    
-    if(listUp[0]->position)
+        case 0: //Center          
 
+            break;
+        case 1: //Right          
+
+            break;
+        case -1: //Left          
+            Survival_AUX_L(bridge);
+        break;
+        default:
+            break;
+    }
 }
 
-int Has_space()
+void Survival_AUX_L(bridge_params_t *bridge)
 {
-    
+    if(bridge->count == 0)
+    {
+        if(aliens_A_top_left[11].threadID != 0)
+        {
+            aliens_A_bottom_left[0] = aliens_A_top_left[11];
+            aliens_A_top_left[11].threadID = 0;
+        }
+    }
+    else if(bridge->dir == 0 && bridge->count > 0)
+    {
+        if(aliens_A_top_left[11].threadID != 0)
+        {
+            if(Has_space(bridge, aliens_A_top_left[11]) == EXIT_SUCCESS)
+            {
+                aliens_A_bottom_left[0] = aliens_A_top_left[11];
+                aliens_A_top_left[11].threadID = 0;
+            }
+        }
+    }
+}
+
+int Has_space(bridge_params_t *bridge, alien_t alien)
+{
+    int a = 0;
+    a += alien.weight;
+    for(int i=0; i<5; i++)
+    {
+        switch (bridge->type)
+        {
+        case 0: //Center          
+            if(aliens_bridge_center[i].threadID != 0)
+            {
+                a += aliens_bridge_center[i].weight;
+            }
+            break;
+        case 1: //Right          
+            if(aliens_bridge_right[i].threadID != 0)
+            {
+                a += aliens_bridge_right[i].weight;
+            }
+            break;
+        case -1: //Left          
+            if(aliens_bridge_left[i].threadID != 0)
+            {
+                a += aliens_bridge_left[i].weight;
+            }
+        break;
+        default:
+            break;
+        }
+    }
+
+    if(a < bridge->max_weight)
+    {
+        return EXIT_SUCCESS;
+    }
+    else
+    {
+        return EXIT_FAILURE;
+    }
 }
