@@ -62,7 +62,7 @@ void *alienloop(void* alien_type_v){
     alien_t newalien = {.threadID = syscall(SYS_gettid),
                         .speed = rand()%50,
                         .weight = rand()%50,
-                        .time = rand()%50,
+                        .time = sleeptime,
                         .position = 0,
                         .alienType = *alien_type}; 
     current_route[0] = newalien;
@@ -85,13 +85,13 @@ void *alienloop(void* alien_type_v){
         int Atop[3]  = {2,3,4};
         int Abottom[3] = {8,9,10};
 
-        int rand_select = rand()%3;
+        int rand_select = 0;//rand()%3;
         int new_route_num = Atop[rand_select];
         alien_t *  new_route = routes[new_route_num];
         // Selection Atop route
         while(new_route[0].threadID != 0){
             usleep(sleeptime);
-            rand_select = rand()%3;
+            rand_select = 0;//rand()%3;
             new_route_num = Atop[rand_select];
             new_route = routes[new_route_num];
         }
@@ -102,33 +102,83 @@ void *alienloop(void* alien_type_v){
         route_number = new_route_num;
         position = 0;
         new_route[0].position = 0;
-
         current_route_size = routes_sizes[route_number];        
+
         while (position < current_route_size - 1){
+            usleep(sleeptime);
             while(current_route[position + 1].threadID != 0){                        
                 usleep(sleeptime);
-            }
-            usleep(sleeptime);
+            }            
             current_route[position+1] = current_route[position];        
             position++;
             current_route[position].position = position; 
             current_route[position - 1].threadID = 0;
         }
+        printf("moved to bridge!\n");
         // Reached bridge!
-        sleep(1);
-
+        usleep(sleeptime);
+        
         // Force copy outside bridge
         
         new_route_num = Abottom[rand_select];
         new_route = routes[new_route_num];
         
-        // Check if route is full
+        // Check if after bridge route is full
+        while(new_route[0].position != 0){
+            printf("crossing bidge %d, %d\n",new_route_num,new_route[0].position );
+            usleep(sleeptime);
+        }
+
+        current_route = new_route;
+        route_number = new_route_num;
+        position = 0;
+        current_route_size = routes_sizes[route_number];   
+        
+        while (position < current_route_size - 1){
+            usleep(sleeptime);
+            while(current_route[position + 1].threadID != 0){                        
+                usleep(sleeptime);
+            }            
+            current_route[position+1] = current_route[position];        
+            position++;
+            current_route[position].position = position; 
+            current_route[position - 1].threadID = 0;
+        }
+
+
+        new_route_num = 14;
+        new_route = routes[new_route_num];
+
+        // Check if Bin route 
         while(new_route[0].threadID != 0){
             usleep(sleeptime);
         }
+
+        new_route[0] = current_route[position];
+        current_route[position].threadID = 0;
         
 
+        current_route = new_route;
+        route_number = new_route_num;
+        position = 0;
+        current_route_size = routes_sizes[route_number];
+        while (position < current_route_size - 1){
+            usleep(sleeptime);
+            while(current_route[position + 1].threadID != 0){                        
+                usleep(sleeptime);
+            }            
+            current_route[position+1] = current_route[position];        
+            position++;
+            current_route[position].position = position; 
+            current_route[position - 1].threadID = 0;
+        }
+
+
+
+
+
     }
+    usleep(sleeptime);
     current_route[position].threadID = 0;
 
     Lthread_end(NULL); 

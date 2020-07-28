@@ -22,12 +22,6 @@ const Point B_top_center [5];
 
 const Point B_top_right [11];
 
-//const Point bridge_left [];
-
-//const Point bridge_center [];
-
-//const Point bridge_right [];
-
 const Point A_bottom_left [9];
 
 const Point A_bottom_center [4];
@@ -43,6 +37,12 @@ const Point B_bottom_right [10];
 const Point B_in [32];
 
 const Point B_out [23];
+
+const Point bridge_left [5];
+
+const Point bridge_center [5];
+
+const Point bridge_right [5];
 
 const int routes_sizes[19];
 

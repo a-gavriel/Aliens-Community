@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "../include/alien.h"
 #include "../include/bridge.h"
@@ -24,11 +25,13 @@ void Survival(bridge_params_t *bridge)
 
 void Survival_AUX_L(bridge_params_t *bridge)
 {
+    usleep(aliens_A_bottom_left[11].time);
     if(bridge->count == 0)
     {
         if(aliens_A_top_left[11].threadID != 0)
         {
             aliens_A_bottom_left[0] = aliens_A_top_left[11];
+            aliens_A_bottom_left[0].position = 0;
             aliens_A_top_left[11].threadID = 0;
         }
     }
@@ -39,6 +42,7 @@ void Survival_AUX_L(bridge_params_t *bridge)
             if(Has_space(bridge, aliens_A_top_left[11]) == EXIT_SUCCESS)
             {
                 aliens_A_bottom_left[0] = aliens_A_top_left[11];
+                aliens_A_bottom_left[0].position = 0;
                 aliens_A_top_left[11].threadID = 0;
             }
         }
