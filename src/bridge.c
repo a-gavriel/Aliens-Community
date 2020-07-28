@@ -184,7 +184,21 @@ void Move()
         aliens_A_bottom_left[0] = aliens_bridge_left[4];
         aliens_A_bottom_left[0].position = 0;
         aliens_bridge_left[4].threadID = 0;
-        kill(aliens_A_top_center[4].threadID, SIGCONT);
+        kill(aliens_A_bottom_left[0].threadID, SIGCONT);
+    }
+    if(aliens_bridge_right[4].threadID != 0 && aliens_A_bottom_right[0].threadID == 0)
+    {
+        aliens_A_bottom_right[0] = aliens_bridge_right[4];
+        aliens_A_bottom_right[0].position = 0;
+        aliens_bridge_right[4].threadID = 0;
+        kill(aliens_A_bottom_right[0].threadID, SIGCONT);
+    }
+    if(aliens_bridge_center[4].threadID != 0 && aliens_A_bottom_center[0].threadID == 0)
+    {
+        aliens_A_bottom_center[0] = aliens_bridge_center[4];
+        aliens_A_bottom_center[0].position = 0;
+        aliens_bridge_center[4].threadID = 0;
+        kill(aliens_A_bottom_center[0].threadID, SIGCONT);
     }
     for(int i=3; i>=0; i--)
     {
@@ -194,6 +208,18 @@ void Move()
             aliens_bridge_left[i+1] = aliens_bridge_left[i];
             aliens_bridge_left[i+1].position = i+1;
             aliens_bridge_left[i].threadID = 0;
+        }
+        if(aliens_bridge_right[i].threadID != 0 && aliens_bridge_right[i+1].threadID == 0)
+        {            
+            aliens_bridge_right[i+1] = aliens_bridge_right[i];
+            aliens_bridge_right[i+1].position = i+1;
+            aliens_bridge_right[i].threadID = 0;
+        }
+        if(aliens_bridge_center[i].threadID != 0 && aliens_bridge_center[i+1].threadID == 0)
+        {            
+            aliens_bridge_center[i+1] = aliens_bridge_center[i];
+            aliens_bridge_center[i+1].position = i+1;
+            aliens_bridge_center[i].threadID = 0;
         }
     }
 }
