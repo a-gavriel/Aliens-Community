@@ -5,6 +5,17 @@
 
 #include "../include/alien.h"
 #include "../include/bridge.h"
+#include "../include/graph_points.h"
+
+const int bridge_pairs [2][3][2] = {
+    {{2,8},{3,9},{4,10}},
+    {{11,5},{12,6},{13,7}}
+    };
+
+const int bridge_routes [3] = {16,17,18};
+
+const int bridge_pos [2][5] = {{0,1,2,3,4},{4,3,2,1,0}};
+const int bridge_dirs [2] = {1,-1};
 
 void BridgeMovements()
 {
@@ -17,7 +28,7 @@ void BridgeMovements()
 
             break;
         case 2: //2 = Algorithm Survival          
-            Survival(&left_bridge);
+            Survival_AUX(&left_bridge);
         break;
         default:
             break;
@@ -32,7 +43,7 @@ void BridgeMovements()
 
             break;
         case 2: //2 = Algorithm Survival          
-            Survival(&center_bridge);
+            Survival_AUX(&center_bridge);
         break;
         default:
             break;
@@ -47,211 +58,128 @@ void BridgeMovements()
 
             break;
         case 2: //2 = Algorithm Survival          
-            Survival(&right_bridge);
+            Survival_AUX(&right_bridge);
         break;
         default:
             break;
     }
-
-    Move();
+    Move_aliens(&left_bridge);
+    Move_aliens(&center_bridge);
+    Move_aliens(&right_bridge);
+    //Move();
 }
 
 void Survival(bridge_params_t *bridge)
 {
-    switch (bridge->position)
+    switch (bridge->pos)
     {
-        case 0: //Center          
-        Survival_AUX_C(bridge);
+        case 1: //Center          
+            Survival_AUX(bridge);
             break;
-        case 1: //Right          
-        Survival_AUX_R(bridge);
+        case 2: //Right          
+            Survival_AUX(bridge);
             break;
-        case -1: //Left          
-            Survival_AUX_L(bridge);
+        case 0: //Left          
+            Survival_AUX(bridge);
         break;
         default:
             break;
     }
 }
 
-//kill(array_pids[i], SIGCONT);
-//sleep(1);
-//kill(array_pids[i], SIGSTOP);
 
-void Survival_AUX_L(bridge_params_t *bridge)
+void Survival_AUX(bridge_params_t *bridge)
 {
     if(bridge->count == 0)
     {
-        if(aliens_A_top_left[11].threadID != 0 && aliens_bridge_left[0].threadID == 0)
-        {
-            usleep(aliens_A_bottom_left[11].time);
-            kill(aliens_A_top_left[11].threadID, SIGSTOP);
-            aliens_bridge_left[0] = aliens_A_top_left[11];
-            bridge->count++;
-            bridge->dir = 0;
-            aliens_bridge_left[0].position = 0;
-            aliens_A_top_left[11].threadID = 0;
+        int start_route = bridge_pairs[0][bridge->pos][0];
+        alien_t* startA = routes[start_route]+routes_sizes[start_route]-1;
+        bridge->dir = 0;
+
+        if(startA->threadID == 0){
+
+            start_route = bridge_pairs[1][bridge->pos][0];
+            startA = routes[start_route]+routes_sizes[start_route]-1;
+            bridge->dir = 1;
         }
+
+        if(startA->threadID != 0)
+        {               
+            alien_t* bridgeA = routes[ bridge_routes[bridge->pos] ];
+            //usleep(startA->time);
+            kill(startA->threadID, SIGTSTP);
+            bridgeA[0] = *startA;
+            bridge->count++;            
+            bridgeA[0].position = 0;
+            startA->threadID = 0;            
+        }    
+
     }
-    else if(bridge->dir == 0 && bridge->count > 0)
+    else    
     {
-        if(aliens_A_top_left[11].threadID != 0 && aliens_bridge_left[0].threadID == 0)
+        int start_route = bridge_pairs[bridge->dir][bridge->pos][0];
+
+        alien_t* startA = routes[start_route]+routes_sizes[start_route]-1;    
+        alien_t* bridgeA = routes[ bridge_routes[bridge->pos] ];
+
+        if(startA->threadID != 0 && bridgeA[0].threadID == 0)
         {
-            if(Has_space(bridge, aliens_A_top_left[11]) == EXIT_SUCCESS)
+            if(Has_space_int(bridge, startA->weight) == EXIT_SUCCESS)
             {
-                usleep(aliens_A_bottom_left[11].time);
-                kill(aliens_A_top_left[11].threadID, SIGSTOP);
-                aliens_bridge_left[0] = aliens_A_top_left[11];
+                //usleep(startA->time);
+                kill(startA->threadID, SIGTSTP);
+                bridgeA[0] = *startA;
                 bridge->count++;
                 bridge->dir = 0;
-                aliens_bridge_left[0].position = 0;
-                aliens_A_top_left[11].threadID = 0;
+                bridgeA[0].position = 0;
+                startA->threadID = 0;
             }
         }
     }
 }
 
-void Survival_AUX_R(bridge_params_t *bridge)
+void Move_aliens(bridge_params_t *bridge)
 {
-    if(bridge->count == 0)
-    {
-        if(aliens_A_top_right[11].threadID != 0 && aliens_bridge_right[0].threadID == 0)
-        {
-            usleep(aliens_A_top_right[11].time);
-            kill(aliens_A_top_right[11].threadID, SIGSTOP);
-            aliens_bridge_right[0] = aliens_A_top_right[11];
-            bridge->count++;
-            bridge->dir = 0;
-            aliens_bridge_right[0].position = 0;
-            aliens_A_top_right[11].threadID = 0;
-        }
-    }
-    else if(bridge->dir == 0 && bridge->count > 0)
-    {
-        if(aliens_A_top_right[11].threadID != 0 && aliens_bridge_right[0].threadID == 0)
-        {
-            if(Has_space(bridge, aliens_A_top_right[11]) == EXIT_SUCCESS)
-            {
-                usleep(aliens_A_top_right[11].time);
-                kill(aliens_A_top_right[11].threadID, SIGSTOP);
-                aliens_bridge_right[0] = aliens_A_top_right[11];
-                bridge->count++;
-                bridge->dir = 0;
-                aliens_bridge_right[0].position = 0;
-                aliens_A_top_right[11].threadID = 0;
-            }
-        }
-    }
-}
+        
+    int end_route = bridge_pairs[bridge->dir][bridge->pos][1];
+      
+    alien_t* endA = routes[end_route];
+    alien_t* bridgeA = routes[ bridge_routes[bridge->pos] ];
 
-void Survival_AUX_C(bridge_params_t *bridge)
-{
-    if(bridge->count == 0)
-    {
-        if(aliens_A_top_center[4].threadID != 0 && aliens_bridge_center[0].threadID == 0)
-        {
-            usleep(aliens_A_top_center[4].time);
-            kill(aliens_A_top_center[4].threadID, SIGSTOP);
-            aliens_bridge_center[0] = aliens_A_top_center[4];
-            bridge->count++;
-            bridge->dir = 0;
-            aliens_bridge_center[0].position = 0;
-            aliens_A_top_center[4].threadID = 0;
-        }
-    }
-    else if(bridge->dir == 0 && bridge->count > 0)
-    {
-        if(aliens_A_top_center[4].threadID != 0 && aliens_bridge_center[0].threadID == 0)
-        {
-            if(Has_space(bridge, aliens_A_top_center[4]) == EXIT_SUCCESS)
-            {
-                usleep(aliens_A_top_center[4].time);
-                kill(aliens_A_top_center[4].threadID, SIGSTOP);
-                aliens_bridge_center[0] = aliens_A_top_center[4];
-                bridge->count++;
-                bridge->dir = 0;
-                aliens_bridge_center[0].position = 0;
-                aliens_A_top_center[4].threadID = 0;
-            }
-        }
-    }
-}
+    int last = bridge_pos[bridge->dir][4];
 
-void Move()
-{
-    if(aliens_bridge_left[4].threadID != 0 && aliens_A_bottom_left[0].threadID == 0)
-    {
-        aliens_A_bottom_left[0] = aliens_bridge_left[4];
-        aliens_A_bottom_left[0].position = 0;
-        aliens_bridge_left[4].threadID = 0;
-        kill(aliens_A_bottom_left[0].threadID, SIGCONT);
+    if(bridgeA[last].threadID != 0 && endA[0].threadID == 0){
+        endA[0] = bridgeA[last];
+        endA[0].position = 0;
+        bridge->count--;
+        bridgeA[last].threadID = 0;
+        kill(bridgeA[0].threadID, SIGCONT);
     }
-    if(aliens_bridge_right[4].threadID != 0 && aliens_A_bottom_right[0].threadID == 0)
-    {
-        aliens_A_bottom_right[0] = aliens_bridge_right[4];
-        aliens_A_bottom_right[0].position = 0;
-        aliens_bridge_right[4].threadID = 0;
-        kill(aliens_A_bottom_right[0].threadID, SIGCONT);
-    }
-    if(aliens_bridge_center[4].threadID != 0 && aliens_A_bottom_center[0].threadID == 0)
-    {
-        aliens_A_bottom_center[0] = aliens_bridge_center[4];
-        aliens_A_bottom_center[0].position = 0;
-        aliens_bridge_center[4].threadID = 0;
-        kill(aliens_A_bottom_center[0].threadID, SIGCONT);
-    }
+
     for(int i=3; i>=0; i--)
     {
 
-        if(aliens_bridge_left[i].threadID != 0 && aliens_bridge_left[i+1].threadID == 0)
+        if(bridgeA[bridge_pos[bridge->dir][i]].threadID != 0 && bridgeA[bridge_pos[bridge->dir][i+1]].threadID == 0)
         {            
-            aliens_bridge_left[i+1] = aliens_bridge_left[i];
-            aliens_bridge_left[i+1].position = i+1;
-            aliens_bridge_left[i].threadID = 0;
+            bridgeA[bridge_pos[bridge->dir][i+1]] = bridgeA[bridge_pos[bridge->dir][i]];
+            bridgeA[bridge_pos[bridge->dir][i+1]].position = i+1;
+            bridgeA[i].threadID = 0;
         }
-        if(aliens_bridge_right[i].threadID != 0 && aliens_bridge_right[i+1].threadID == 0)
-        {            
-            aliens_bridge_right[i+1] = aliens_bridge_right[i];
-            aliens_bridge_right[i+1].position = i+1;
-            aliens_bridge_right[i].threadID = 0;
-        }
-        if(aliens_bridge_center[i].threadID != 0 && aliens_bridge_center[i+1].threadID == 0)
-        {            
-            aliens_bridge_center[i+1] = aliens_bridge_center[i];
-            aliens_bridge_center[i+1].position = i+1;
-            aliens_bridge_center[i].threadID = 0;
-        }
+
     }
 }
 
-int Has_space(bridge_params_t *bridge, alien_t alien)
+
+int Has_space_int(bridge_params_t *bridge, int alien_weight)
 {
     int a = 0;
-    a += alien.weight;
+    a += alien_weight;
+    alien_t* bridgeA = routes[ bridge_routes[bridge->pos] ];
     for(int i=0; i<5; i++)
     {
-        switch (bridge->type)
+        if(bridgeA[i].threadID != 0)
         {
-        case 0: //Center          
-            if(aliens_bridge_center[i].threadID != 0)
-            {
-                a += aliens_bridge_center[i].weight;
-            }
-            break;
-        case 1: //Right          
-            if(aliens_bridge_right[i].threadID != 0)
-            {
-                a += aliens_bridge_right[i].weight;
-            }
-            break;
-        case -1: //Left          
-            if(aliens_bridge_left[i].threadID != 0)
-            {
-                a += aliens_bridge_left[i].weight;
-            }
-        break;
-        default:
-            break;
+            a += bridgeA[i].weight;
         }
     }
 

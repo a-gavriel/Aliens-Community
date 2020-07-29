@@ -17,6 +17,14 @@ typedef struct aliens {
 } alien_t;
 
 const char alienTypes[6];
+const int intersection_Atop_Bbottom[2][3];
+const int intersection_Abottom_Btop[2][3];
+const int exit_route[2];
+
+const int Atop[3] ;
+const int Abottom[3];
+const int Bbottom[3] ;
+const int Btop[3];
 
 alien_t aliens_A_in [32];
 alien_t aliens_A_out [24];
@@ -40,17 +48,17 @@ alien_t aliens_bridge_right [5];
 
 alien_t *routes[19];
 
-int getAlien(int x, int y);
+int getAlien(int x, int y, unsigned int button);
 
-void *alienloop(void* route_number_ptr);
+void* alienloop(void* route_number_ptr);
 
 int generateAlien( const char* alien_type );
-
-
+int timedsleep(int sleeptime, alien_t* alien);
+int move_through_road(int old_position, int route_number, int sleeptime, char* alien_type);
+int alien_start(char* alien_type, int* direction, int* sleeptime );
 lmutex_t lmutex;
 
-
 int init_mutex();
-
+void kill_threads();
 
 #endif

@@ -72,10 +72,20 @@ void draw_aliens(ALLEGRO_BITMAP* alien1, ALLEGRO_BITMAP* alien2, ALLEGRO_BITMAP*
                         al_draw_bitmap(alien2, cx, cy, ALLEGRO_FLIP_HORIZONTAL);
                         break;
                     case 'B':
-                        al_draw_bitmap(alien3, cx, cy, 0);
+                        if(currentRoute[j].time == 0){
+                            al_draw_bitmap(alien3, cx, cy, ALLEGRO_FLIP_VERTICAL);
+                        }else{
+                            al_draw_bitmap(alien3, cx, cy, 0);
+                        }
+                        
                         break;
                     case 'b':
-                        al_draw_bitmap(alien3, cx, cy, ALLEGRO_FLIP_HORIZONTAL);
+                        if(currentRoute[j].time == 0){
+                            al_draw_bitmap(alien3, cx, cy, ALLEGRO_FLIP_HORIZONTAL | ALLEGRO_FLIP_VERTICAL);
+                        }else{
+                            al_draw_bitmap(alien3, cx, cy, ALLEGRO_FLIP_HORIZONTAL);
+                        }
+                        
                         break;
                     
                 }
@@ -91,9 +101,13 @@ int main()
     //Read all config files
     Read_program_config();
     //Bridges
-    left_bridge = (bridge_params_t){0,0,bridgeL.max_weigth,-1,bridgeL.bridge_type};
-    right_bridge = (bridge_params_t){0,0,bridgeR.max_weigth,1,bridgeL.bridge_type};
-    center_bridge = (bridge_params_t){0,0,bridgeC.max_weigth,0,bridgeL.bridge_type};
+    left_bridge = (bridge_params_t){0,0,bridgeL.max_weigth,0,bridgeL.bridge_type};    
+    center_bridge = (bridge_params_t){0,0,bridgeC.max_weigth,1,bridgeL.bridge_type};
+    right_bridge = (bridge_params_t){0,0,bridgeR.max_weigth,2,bridgeL.bridge_type};
+    bridges_t[0] = &left_bridge;
+    bridges_t[1] = &center_bridge;
+    bridges_t[2] = &right_bridge;
+        
 
     init_mutex();
 
@@ -138,13 +152,6 @@ int main()
     bool done = false;
     bool redraw = true;
     ALLEGRO_EVENT event;
-
-    float x, y;
-    x = 100;
-    y = 100;
-
-    int counter = 0;
-    
     
     #define KEY_SEEN     1
     #define KEY_RELEASED 2
@@ -158,11 +165,11 @@ int main()
     srand((unsigned) time(&t));
     uint frame = 0;
     printf("%d,%d,%d\n",aliensG.alfa,aliensG.beta,aliensG.normal);
-    printf("randome seed %d\n",aliensG.mean);
-    double randomseed = (double) aliensG.mean;
-    uint randomexp = expRandom(randomseed);
-    uint f_new_alien = randomexp*30/1000000;
-    printf("Next alien in %d\n",f_new_alien/30);
+    //printf("randome seed %d\n",aliensG.mean);
+    double randomseed = ((double) aliensG.mean)/1000000;
+    unsigned int randomexp = expRandom(randomseed);
+    unsigned int f_new_alien = randomexp*30/1000000;
+    //printf("Next alien in %d frames\n",f_new_alien);
     int randint;
     while(1)
     {
@@ -170,15 +177,7 @@ int main()
 
         switch(event.type)
         {
-            case ALLEGRO_EVENT_TIMER:
-                if(key[ALLEGRO_KEY_UP]){ 
-                    key[ALLEGRO_KEY_UP] = 0;
-                    counter = (counter + 1)%12;                    
-                    x = A_top_right[counter].x;
-                    y = A_top_right[counter].y;
-                    
-                    printf("moved rect to: %f,%f\n",x,y);
-                    }
+            case ALLEGRO_EVENT_TIMER:                
                     
                 if(key[ALLEGRO_KEY_ESCAPE])
                     done = true;
@@ -210,7 +209,7 @@ int main()
                     
                     randomexp = expRandom(randomseed);
                     f_new_alien = randomexp*30/1000000;
-                    printf("Next alien in %d\n",f_new_alien/30);
+                    //printf("Next alien in %d frames\n",f_new_alien);
                 }
                 BridgeMovements();
                 redraw = true;
@@ -219,10 +218,8 @@ int main()
 
 
             case  ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
-                printf("clicked: %d,%d\n",event.mouse.x,event.mouse.y);
-                int r = getAlien(event.mouse.x,event.mouse.y);
-                if (r!=-1)
-                    printf("alien found in %d\n",r);
+                getAlien(event.mouse.x,event.mouse.y, event.mouse.button );                
+                
                 break;
             case ALLEGRO_EVENT_KEY_DOWN:
                 //key[event.keyboard.keycode] = KEY_SEEN | KEY_RELEASED;
@@ -259,6 +256,6 @@ int main()
     al_destroy_timer(timer);
     al_destroy_event_queue(queue);
 
-    exit(3);
-    //return 0;
+    kill_threads();
+    return 0;
 }
