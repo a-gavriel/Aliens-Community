@@ -196,6 +196,11 @@ int main()
 
                 for(int i = 0; i < ALLEGRO_KEY_MAX; i++)
                     key[i] = 0;
+                
+                if(frame % 5 == 1){
+                    BridgeMovements();
+                }
+
                 if(frame == f_new_alien){
                     frame = 0;
                     randint = rand()%100;
@@ -211,7 +216,7 @@ int main()
                     f_new_alien = randomexp*30/1000000;
                     //printf("Next alien in %d frames\n",f_new_alien);
                 }
-                BridgeMovements();
+                
                 redraw = true;
                 ++frame;
                 break;
@@ -239,8 +244,7 @@ int main()
         if(redraw && al_is_event_queue_empty(queue))
         {
             al_clear_to_color(al_map_rgb(0, 0, 0));
-			al_draw_bitmap(wallpaper,0,0,0);
-            al_draw_filled_rectangle(100, 100, 100 + 10, 100 + 10, al_map_rgb(255, 0, 0));
+			al_draw_bitmap(wallpaper,0,0,0);            
 			draw_aliens(alien1, alien2, alien3);
             al_flip_display();
 

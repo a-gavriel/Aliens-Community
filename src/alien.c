@@ -36,11 +36,10 @@ int init_mutex(){
 }
 
 int timedsleep(int sleeptime, alien_t* alien){
-    int* remainder = &(alien->time);
-    if (*remainder > sleeptime){
-        *remainder -= sleeptime;
+    if (alien->time > sleeptime){
+        alien->time -= sleeptime;
     }else if(alien->alienType == 'B' || alien->alienType == 'b'){
-        *remainder = 0;                
+        alien->time = 0;                
         kill(alien->threadID, SIGTSTP);                
     }
     return usleep(sleeptime);
@@ -127,8 +126,10 @@ void* alienloop(void* alien_type_v){
     int route_number;
     int direction;
     int sleeptime;
+    pid_t cid;
     route_number = alien_start(alien_type, &direction, &sleeptime );
     int position = 0;
+    cid = (routes[route_number])[0].threadID;
     position = move_through_road(position, route_number, sleeptime, alien_type);    
 
     // Reached intersection_Atop_Bbottom
@@ -152,27 +153,17 @@ void* alienloop(void* alien_type_v){
     position = move_through_road(position, route_number, sleeptime, alien_type); 
     
     // Reached bridge!    
+    timedsleep(sleeptime, &((routes[route_number])[position]));
     // Get route after bridge
     new_route_num = intersection_Abottom_Btop[direction][rand_select];
     new_route = routes[new_route_num];        
     // Check if placed after route?
-    while(new_route[0].position != 0){        
-        usleep(sleeptime);
+    while(new_route[0].threadID != cid){        
+        timedsleep(sleeptime, &((routes[route_number])[position]));
     }
-    
-    Lmutex_lock(&lmutex);
+        
     route_number = new_route_num;
     position = 0;  
-    usleep(sleeptime);
-    while(new_route[position + 1].threadID != 0){                        
-        usleep(sleeptime);
-    }                
-    new_route[position+1] = new_route[position];        
-    position++;
-    new_route[position].position = position; 
-    new_route[position - 1].threadID = 0;
-    Lmutex_unlock(&lmutex);
-
     position = move_through_road(position, route_number, sleeptime, alien_type); 
     
     // Reached intersection_Abottom_Btop
