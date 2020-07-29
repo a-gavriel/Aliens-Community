@@ -48,6 +48,15 @@ typedef struct aliens_generator
 
 } aliens_generator_t;
 
+bridge_t bridgeC;
+bridge_t bridgeL;
+bridge_t bridgeR;
+alien_normal_t alienN;
+alien_beta_t alienB;
+aliens_generator_t aliensG;
+
+int Read_program_config();
+
 int Read_bridge_configFile(char *file_name, bridge_t *bridge);
 int Read_alien_normal_configFile(char *file_name, alien_normal_t *alien);
 int Read_alien_beta_configFile(char *file_name, alien_beta_t *alien);

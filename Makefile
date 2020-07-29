@@ -50,6 +50,9 @@ Utils:
 Tests:
 	$(CC) ./$(SRC_DIR)/Tests.c $(ALL_STATIC_LIB_PATH) $(LIBS_FLAG) -lpthread -o ./$(BIN_DIR)/Tests
 
-
 graphics:
-	$(CC) ./$(SRC_DIR)/graphics.c -o ./$(BIN_DIR)/graphics `pkg-config --libs $(ALLEGRO_LIBS)` $(ALL_STATIC_LIB_PATH) $(LIBS_FLAG) 
+	$(CC) ./$(SRC_DIR)/bridge.c ./$(SRC_DIR)/alien.c ./$(SRC_DIR)/graph_points.c ./$(SRC_DIR)/graphics.c -o ./$(BIN_DIR)/graphics $(CFLAGS) `pkg-config --libs $(ALLEGRO_LIBS)` $(ALL_STATIC_LIB_PATH) $(LIBS_FLAG) 
+
+kill-compile-graphics: 
+	killall ./bin/graphics
+	make graphics

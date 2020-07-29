@@ -133,3 +133,13 @@ int Read_aliens_generator_configFile(char *file_name, aliens_generator_t *genera
     generator->mean = json_object_get_int(mean);
     return EXIT_SUCCESS;
 }
+
+int Read_program_config()
+{
+    Read_bridge_configFile(FILE_NAME_BRIDGE_I, &bridgeL);
+    Read_bridge_configFile(FILE_NAME_BRIDGE_C, &bridgeC);
+    Read_bridge_configFile(FILE_NAME_BRIDGE_D, &bridgeR);
+    Read_alien_normal_configFile(FILE_NAME_ALIEN_N, &alienN);
+    Read_alien_beta_configFile(FILE_NAME_ALIEN_B, &alienB);
+    Read_aliens_generator_configFile(FILE_NAME_ALIEN_GENERATOR, &aliensG);
+}

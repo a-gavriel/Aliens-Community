@@ -1,3 +1,6 @@
+#ifndef _LMUTEX_H_
+#define _LMUTEX_H
+
 #define INIT 1
 #define DESROY 0
 
@@ -12,3 +15,5 @@ int Lmutex_lock(lmutex_t *sem);
 void Lmutex_unlock(lmutex_t *sem);
 int Lmutex_destroy(lmutex_t *sem);
 int Lmutex_trylock(lmutex_t *sem);
+
+#endif
